@@ -8,7 +8,7 @@
 [![PyPI](https://img.shields.io/pypi/v/hugesitemap.svg)](https://pypi.org/project/hugesitemap/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/hugesitemap.svg)](https://pypi.org/project/hugesitemap/)
 [![Code Style: Ruff](https://img.shields.io/badge/Code%20Style-Ruff-46A3FF?logo=ruff&labelColor=000)](https://docs.astral.sh/ruff/)
-[![codecov](https://codecov.io/gh/bitranox/hugesitemap/graph/badge.svg?token=UFBaUDIgRk)](https://codecov.io/gh/bitranox/hugesitemap)
+[![codecov](https://codecov.io/gh/bitranox/hugesitemap/graph/badge.svg?token=EbL5IdJD9o)](https://codecov.io/gh/bitranox/hugesitemap)
 [![Maintainability](https://qlty.sh/badges/041ba2c1-37d6-40bb-85a0-ec5a8a0aca0c/maintainability.svg)](https://qlty.sh/gh/bitranox/projects/hugesitemap)
 [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
 
