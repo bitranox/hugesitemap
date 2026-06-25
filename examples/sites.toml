@@ -1,0 +1,55 @@
+# Example multi-site sitemap configuration.
+#
+# Deploy this as the application-layer config so lib_layered_config discovers it,
+# e.g. /etc/xdg/hugesitemap/config.toml (Linux app layer). All sites live in one
+# file as an array of tables; no profiles are needed.
+#
+# Generate every site:        hugesitemap generate
+# Generate selected sites:    hugesitemap generate --site docs,files
+# Dry run / gzip:             hugesitemap generate --site docs --dry-run --gzip
+#
+# NOTE: keep the full [[site]] array in a single layer. lib_layered_config
+# deep-merges nested tables but replaces lists wholesale (last writer wins), so a
+# higher layer carrying a `site` array would replace this one rather than append.
+
+# Global defaults shared by every site. Scalars (gzip, default_priority) are
+# inherited unless a site overrides them; the global filters are PREPENDED to
+# each site's own filters (extend), so the common drops live here only once.
+[sitemap]
+gzip             = false
+default_priority = 0.5
+
+  [sitemap.filters]
+  drop = ["*~", "re:/\\.[^/]*", "*.txt*", "*.log*", "*.py*"]
+
+[[site]]
+name        = "docs"
+base_url    = "https://docs.example.com/"
+output_path = "/srv/www/docs/sitemap.xml"
+
+  [[site.directory]]
+  path = "/srv/www/docs/guides"
+  url  = "https://docs.example.com/guides/"
+
+  [[site.directory]]
+  path = "/srv/www/docs/api"
+  url  = "https://docs.example.com/api/"
+
+  [[site.url]]
+  loc        = "https://docs.example.com/index.html"
+  changefreq = "weekly"
+  priority   = 1.0
+
+  [site.filters]
+  # Appended after the global drops above; only the docs-specific extra here.
+  drop = ["*/drafts/*"]
+
+[[site]]
+name        = "files"
+base_url    = "https://files.example.com/"
+output_path = "/srv/www/files/sitemap.xml"
+gzip        = true                          # override the global default for this site
+
+  [[site.directory]]
+  path = "/srv/www/files/downloads"
+  url  = "https://files.example.com/downloads/"
