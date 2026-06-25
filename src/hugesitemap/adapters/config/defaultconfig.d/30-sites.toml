@@ -1,0 +1,43 @@
+# Sitemap site definitions.
+#
+# Sites are declared as an array of tables: one [[site]] entry per site. The
+# `generate` command processes every configured site by default; restrict it
+# with `--site media,www` or `--site all`.
+#
+# This default ships with NO sites configured. Deploy your own sites to the
+# application layer (e.g. /etc/xdg/hugesitemap/config.toml) or a config.d
+# drop-in. Keep the whole [[site]] array in a single layer: lib_layered_config
+# deep-merges nested tables but replaces lists wholesale (last writer wins).
+#
+# Optional [sitemap] section: global defaults shared by every site.
+#   [sitemap]
+#   gzip             = false       # inherited unless a site sets its own
+#   default_priority = 0.5         # inherited unless a site sets its own
+#     [sitemap.filters]
+#     drop = ["*~", "re:/\\.[^/]*"] # PREPENDED to each site's own drop patterns
+#
+# Scalars (gzip, default_priority) use override semantics; the global filters
+# extend each site's filters (global patterns first, then the site's own).
+#
+# Schema for each entry:
+#
+#   [[site]]
+#   name        = "media"                       # unique; used by --site
+#   base_url    = "https://media.example.com/"
+#   output_path = "/srv/www/media/sitemap.xml"
+#   gzip        = false                          # optional, default false
+#   default_priority = 0.5                       # optional, default 0.5
+#
+#     [[site.directory]]                         # repeatable: disk path -> URL prefix
+#     path = "/srv/www/media/content"
+#     url  = "https://media.example.com/content/"
+#
+#     [[site.url]]                               # repeatable: explicit extra URLs
+#     loc        = "https://media.example.com/index.html"
+#     changefreq = "yearly"
+#     priority   = 0.1
+#
+#     [site.filters]                             # ordered drop patterns
+#     drop = ["*~", "re:/\\.[^/]*", "*.txt*"]    # shell wildcard unless "re:" prefix
+#
+# A full two-site example lives in the repository's examples/sites.toml.
