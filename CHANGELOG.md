@@ -6,6 +6,11 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- `walk_directory` now skips building the igittigitt parser and the per-path
+  `is_ignored` stat when a site configures no filters (`FilterSpec.is_empty`),
+  removing parser construction and one `stat` per path for unfiltered sites.
+
 ## [2.0.1] - 2026-06-27
 
 ### Documentation

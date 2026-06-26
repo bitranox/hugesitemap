@@ -58,7 +58,9 @@ def walk_directory(
     if not root_path.is_dir():
         return
 
-    path_filter = build_filter(filter_spec, root=str(root_path))
+    # When the site configures no filters, skip building a parser and the
+    # per-path is_ignored() stat entirely; nothing is ever excluded.
+    path_filter = None if filter_spec.is_empty else build_filter(filter_spec, root=str(root_path))
 
     for dirpath_str, dirnames, filenames in os.walk(root_path):
         dirnames.sort()
@@ -68,13 +70,14 @@ def walk_directory(
         rel_posix = "" if relative == Path() else relative.as_posix()
 
         # Prune excluded subdirectories so os.walk never descends into them.
-        dirnames[:] = [name for name in dirnames if not path_filter.is_ignored(str(dirpath / name))]
+        if path_filter is not None:
+            dirnames[:] = [name for name in dirnames if not path_filter.is_ignored(str(dirpath / name))]
 
         yield _entry_for(dirpath, _dir_loc(url_prefix, rel_posix), default_priority)
 
         for name in filenames:
             full = dirpath / name
-            if path_filter.is_ignored(str(full)):
+            if path_filter is not None and path_filter.is_ignored(str(full)):
                 continue
             file_rel = f"{rel_posix}/{name}" if rel_posix else name
             yield _entry_for(full, join_url(url_prefix, file_rel), default_priority)
