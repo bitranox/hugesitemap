@@ -14,10 +14,14 @@
 #   gzip             = false       # inherited unless a site sets its own
 #   default_priority = 0.5         # inherited unless a site sets its own
 #     [sitemap.filters]
-#     drop = ["*~", "re:/\\.[^/]*"] # PREPENDED to each site's own drop patterns
+#     ignore = ["*~", ".*"]        # PREPENDED to each site's own ignore patterns
 #
 # Scalars (gzip, default_priority) use override semantics; the global filters
 # extend each site's filters (global patterns first, then the site's own).
+#
+# Filtering uses git .gitignore semantics (via igittigitt): patterns are
+# anchored at each directory root, a trailing-slash pattern (e.g. "zsvc/") prunes
+# a whole subtree, and "!pattern" re-includes (an allowlist: "*" then "!*.html").
 #
 # Schema for each entry:
 #
@@ -37,7 +41,9 @@
 #     changefreq = "yearly"
 #     priority   = 0.1
 #
-#     [site.filters]                             # ordered drop patterns
-#     drop = ["*~", "re:/\\.[^/]*", "*.txt*"]    # shell wildcard unless "re:" prefix
+#     [site.filters]                             # gitignore-style exclusion rules
+#     ignore = ["*~", ".*", "*.txt"]             # inline .gitignore patterns
+#     # ignore_file = "/srv/www/media/.sitemapignore"   # optional rules file
+#     # nested_ignore_filename = ".sitemapignore"       # discover per-directory files
 #
 # A full two-site example lives in the repository's examples/sites.toml.

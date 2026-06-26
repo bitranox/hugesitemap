@@ -63,32 +63,32 @@ and lxml validation but writes nothing to disk.
 All build and automation targets delegate to `uvx bmk@latest`. Trailing
 arguments are forwarded automatically (e.g. `make run generate --dry-run`).
 
-| Target            | Aliases       | Description                                                            |
-|-------------------|---------------|-----------------------------------------------------------------------|
-| `test`            | `t`           | Lint, format, type-check, run tests with coverage                     |
-| `testintegration` | `testi`, `ti` | Run integration tests only (external resources)                       |
-| `codecov`         | `coverage`, `cov` | Upload coverage report to Codecov                                 |
-| `build`           | `bld`         | Build wheel/sdist artifacts                                           |
-| `clean`           | `cln`, `cl`   | Remove caches, coverage, and build artifacts                          |
-| `run`             |               | Run the project CLI via uvx (forwards trailing args)                  |
-| `bump-major`      |               | Increment major version ((X+1).0.0)                                   |
-| `bump-minor`      |               | Increment minor version (X.Y.Z -> X.(Y+1).0)                          |
-| `bump-patch`      |               | Increment patch version (X.Y.Z -> X.Y.(Z+1))                          |
-| `bump`            |               | Bump patch version (default)                                          |
-| `commit`          | `c`           | Create a git commit with a timestamped message                        |
-| `push`            | `psh`, `p`    | Run tests, commit, and push to remote                                 |
-| `release`         | `rel`, `r`    | Tag vX.Y.Z, push, create GitHub release                               |
-| `dependencies`    | `deps`, `d`   | Check and list project dependencies                                   |
-| `dependencies-update` |           | Update dependencies to latest versions                                |
-| `config`          |               | Show current merged configuration                                     |
-| `config-deploy`   |               | Deploy configuration to system/user directories                      |
-| `config-generate-examples` |      | Generate example configuration files                                  |
-| `info`            |               | Print resolved package metadata                                       |
-| `logdemo`         |               | Run the logging demonstration                                         |
-| `version-current` |               | Print the current version                                            |
-| `dev`             |               | Editable install (`uv pip install -e .`)                              |
-| `install`         |               | Editable install (no dev extras)                                      |
-| `help`            |               | Show make targets                                                     |
+| Target                     | Aliases           | Description                                          |
+|----------------------------|-------------------|------------------------------------------------------|
+| `test`                     | `t`               | Lint, format, type-check, run tests with coverage    |
+| `testintegration`          | `testi`, `ti`     | Run integration tests only (external resources)      |
+| `codecov`                  | `coverage`, `cov` | Upload coverage report to Codecov                    |
+| `build`                    | `bld`             | Build wheel/sdist artifacts                          |
+| `clean`                    | `cln`, `cl`       | Remove caches, coverage, and build artifacts         |
+| `run`                      |                   | Run the project CLI via uvx (forwards trailing args) |
+| `bump-major`               |                   | Increment major version ((X+1).0.0)                  |
+| `bump-minor`               |                   | Increment minor version (X.Y.Z -> X.(Y+1).0)         |
+| `bump-patch`               |                   | Increment patch version (X.Y.Z -> X.Y.(Z+1))         |
+| `bump`                     |                   | Bump patch version (default)                         |
+| `commit`                   | `c`               | Create a git commit with a timestamped message       |
+| `push`                     | `psh`, `p`        | Run tests, commit, and push to remote                |
+| `release`                  | `rel`, `r`        | Tag vX.Y.Z, push, create GitHub release              |
+| `dependencies`             | `deps`, `d`       | Check and list project dependencies                  |
+| `dependencies-update`      |                   | Update dependencies to latest versions               |
+| `config`                   |                   | Show current merged configuration                    |
+| `config-deploy`            |                   | Deploy configuration to system/user directories      |
+| `config-generate-examples` |                   | Generate example configuration files                 |
+| `info`                     |                   | Print resolved package metadata                      |
+| `logdemo`                  |                   | Run the logging demonstration                        |
+| `version-current`          |                   | Print the current version                            |
+| `dev`                      |                   | Editable install (`uv pip install -e .`)             |
+| `install`                  |                   | Editable install (no dev extras)                     |
+| `help`                     |                   | Show make targets                                    |
 
 ## Testing and Linting
 
@@ -115,11 +115,11 @@ defined in `pyproject.toml` (domain stays pure; dependencies point inward only).
 Tests that require external resources are marked with
 `@pytest.mark.local_only` and excluded from the default `make test` run.
 
-| Command              | What it runs                                      |
-|----------------------|---------------------------------------------------|
-| `make test`          | All tests EXCEPT `local_only` (default for CI)    |
-| `make testintegration` | ONLY `local_only` integration tests             |
-| `pytest tests/`      | ALL tests (no marker filter)                      |
+| Command                | What it runs                                   |
+|------------------------|------------------------------------------------|
+| `make test`            | All tests EXCEPT `local_only` (default for CI) |
+| `make testintegration` | ONLY `local_only` integration tests            |
+| `pytest tests/`        | ALL tests (no marker filter)                   |
 
 Mark new tests that touch external resources so CI skips them:
 
@@ -146,7 +146,7 @@ src/hugesitemap/
 │   ├── model.py         # SitemapEntry and related value objects
 │   ├── enums.py         # Type-safe enums
 │   ├── errors.py        # Domain exception types
-│   ├── filters.py       # Drop-filter matching (wildcards and re: regexps)
+│   ├── filters.py       # FilterSpec value object (gitignore exclusion rules)
 │   ├── formatting.py    # lastmod / priority formatting helpers
 │   └── limits.py        # 50,000-URL split limits
 │

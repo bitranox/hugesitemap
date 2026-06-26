@@ -1,118 +1,59 @@
-"""Pure ordered filter engine for selecting which paths enter the sitemap.
+"""Pure description of which paths a site excludes from its sitemap.
 
-Reproduces the old ``sitemap_gen.py`` filter behaviour: an ordered list of
-drop patterns, each either a shell wildcard (``fnmatch``) or a regular
-expression prefixed with ``re:``. A path is dropped when any pattern matches.
-Patterns match against the path relative to its directory root, normalised to
-forward slashes with a leading ``/`` so anchored regexps such as
-``re:/\\.[^/]*`` (hidden dotfiles) and wildcards such as ``*/zsvc/z_content/*``
-behave as in the original tool.
+The actual matching is performed with full git ``.gitignore`` semantics by the
+``igittigitt`` library, which lives in the adapter layer (see
+``adapters/gitignore_filter.py``). The domain only owns the *shape* of a filter
+- a value object naming the rule sources - so it stays free of I/O and
+third-party imports.
+
+A :class:`FilterSpec` carries three rule sources, applied in precedence order
+(later sources win, exactly like git's last-matching-rule rule):
+
+1. ``patterns`` - inline ``.gitignore`` patterns, anchored at the directory root.
+2. ``ignore_file`` - an optional path to a ``.gitignore``-format file.
+3. ``nested_filename`` - an optional per-directory ignore filename (for example
+   ``.sitemapignore``) discovered throughout the scanned tree, git-style.
 
 Contents:
-    * :data:`REGEX_PREFIX` - marker that selects regexp matching.
-    * :class:`Matcher` - a single compiled drop pattern.
-    * :func:`compile_filters` - compile raw patterns into matchers.
-    * :func:`is_dropped` - decide whether a relative path is dropped.
+    * :class:`FilterSpec` - the immutable filter description.
 """
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
-from fnmatch import fnmatch
-from re import Pattern
-
-REGEX_PREFIX = "re:"
-"""Pattern prefix selecting regular-expression matching instead of wildcard."""
 
 
 @dataclass(frozen=True, slots=True)
-class Matcher:
-    """A single compiled drop pattern.
-
-    Exactly one of ``regexp``/``wildcard`` is active: when ``regexp`` is set the
-    pattern used the ``re:`` prefix and ``wildcard`` is unused (empty string);
-    otherwise ``wildcard`` holds the shell pattern.
+class FilterSpec:
+    """Immutable description of a site's path-exclusion rules.
 
     Attributes:
-        raw: The original pattern string (for diagnostics).
-        regexp: Compiled regexp for ``re:``-prefixed patterns, else ``None``.
-        wildcard: The shell wildcard pattern (empty when ``regexp`` is set).
-    """
-
-    raw: str
-    regexp: Pattern[str] | None
-    wildcard: str
-
-    def matches(self, candidate: str) -> bool:
-        """Return whether ``candidate`` matches this pattern.
-
-        Args:
-            candidate: Leading-slash, forward-slash relative path.
-
-        Returns:
-            ``True`` if the pattern matches.
-        """
-        if self.regexp is not None:
-            return self.regexp.search(candidate) is not None
-        return fnmatch(candidate, self.wildcard)
-
-
-def compile_filters(patterns: tuple[str, ...]) -> tuple[Matcher, ...]:
-    """Compile raw drop patterns into ordered :class:`Matcher` objects.
-
-    Args:
-        patterns: Drop patterns, wildcard unless prefixed with ``re:``.
-
-    Returns:
-        A tuple of matchers in the original order.
+        patterns: Inline ``.gitignore`` patterns, anchored at the directory root.
+        ignore_file: Optional path to a ``.gitignore``-format rule file.
+        nested_filename: Optional per-directory ignore filename to discover
+            within each scanned tree (for example ``.sitemapignore``); ``None``
+            disables nested discovery.
 
     Example:
-        >>> matchers = compile_filters(("*~", "re:/\\\\.[^/]*"))
-        >>> len(matchers)
-        2
-        >>> matchers[1].regexp is not None
+        >>> spec = FilterSpec(patterns=("*~", ".*"))
+        >>> spec.patterns
+        ('*~', '.*')
+        >>> FilterSpec().is_empty
         True
-    """
-    compiled: list[Matcher] = []
-    for pattern in patterns:
-        if pattern.startswith(REGEX_PREFIX):
-            expr = pattern[len(REGEX_PREFIX) :]
-            compiled.append(Matcher(raw=pattern, regexp=re.compile(expr), wildcard=""))
-        else:
-            compiled.append(Matcher(raw=pattern, regexp=None, wildcard=pattern))
-    return tuple(compiled)
-
-
-def is_dropped(relpath: str, matchers: tuple[Matcher, ...]) -> bool:
-    """Return whether a relative path is dropped by any matcher.
-
-    The path is normalised to a leading-slash, forward-slash form before
-    matching so anchored patterns behave consistently across operating systems.
-
-    Args:
-        relpath: Path relative to the directory root (any slash style).
-        matchers: Compiled matchers from :func:`compile_filters`.
-
-    Returns:
-        ``True`` if any matcher matches (the path is dropped).
-
-    Example:
-        >>> matchers = compile_filters(("*.txt*", "re:/\\\\.[^/]*"))
-        >>> is_dropped("sub/notes.txt", matchers)
-        True
-        >>> is_dropped(".hidden", matchers)
-        True
-        >>> is_dropped("sub/file.pdf", matchers)
+        >>> spec.is_empty
         False
     """
-    candidate = "/" + relpath.replace("\\", "/").lstrip("/")
-    return any(matcher.matches(candidate) for matcher in matchers)
+
+    patterns: tuple[str, ...] = ()
+    ignore_file: str | None = None
+    nested_filename: str | None = None
+
+    @property
+    def is_empty(self) -> bool:
+        """Return whether the spec selects nothing (no rule source set)."""
+        return not self.patterns and self.ignore_file is None and self.nested_filename is None
 
 
 __all__ = [
-    "Matcher",
-    "REGEX_PREFIX",
-    "compile_filters",
-    "is_dropped",
+    "FilterSpec",
 ]

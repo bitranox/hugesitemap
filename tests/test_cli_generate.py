@@ -35,7 +35,7 @@ def _site_dict(tmp_path: Path, name: str, *, gzip: bool = False) -> dict[str, An
         "gzip": gzip,
         "directory": [{"path": str(data), "url": f"https://{name}.test/a000/"}],
         "url": [{"loc": f"https://{name}.test/index.html", "changefreq": "yearly", "priority": 0.1}],
-        "filters": {"drop": ["*.txt*"]},
+        "filters": {"ignore": ["*.txt"]},
     }
 
 

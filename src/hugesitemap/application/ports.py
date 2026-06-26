@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Protocol
 
 from ..domain.enums import DeployTarget, OutputFormat
-from ..domain.filters import Matcher
+from ..domain.filters import FilterSpec
 from ..domain.model import SitemapDocument, SitemapEntry
 
 if TYPE_CHECKING:
@@ -80,7 +80,7 @@ class ContentSource(Protocol):
 
     Emits both directory URLs (trailing slash) and file URLs, mapping each
     on-disk relative path under ``root`` to a URL under ``url_prefix`` and
-    dropping any path matched by ``matchers``.
+    excluding any path matched by ``filter_spec`` (gitignore semantics).
     """
 
     def __call__(
@@ -88,7 +88,7 @@ class ContentSource(Protocol):
         *,
         root: str,
         url_prefix: str,
-        matchers: tuple[Matcher, ...],
+        filter_spec: FilterSpec,
         default_priority: float,
     ) -> Iterable[SitemapEntry]: ...
 

@@ -21,15 +21,15 @@ There are two distinct configuration concerns, both served by the same layered f
 
 Configuration is loaded and merged in the following order (lowest to highest precedence):
 
-| Priority | Layer        | Description                                      |
-|:--------:|--------------|--------------------------------------------------|
-| 1        | **defaults** | Bundled with the package (`defaultconfig.toml`)  |
-| 2        | **app**      | System-wide settings for all machines            |
-| 3        | **host**     | Machine-specific overrides                       |
-| 4        | **user**     | User's personal settings                         |
-| 5        | **.env**     | Project directory dotenv file                    |
-| 6        | **env vars** | Environment variables                            |
-| 7        | **CLI**      | Command-line `--set` flags (highest priority)    |
+| Priority | Layer        | Description                                     |
+|:--------:|--------------|-------------------------------------------------|
+| 1        | **defaults** | Bundled with the package (`defaultconfig.toml`) |
+| 2        | **app**      | System-wide settings for all machines           |
+| 3        | **host**     | Machine-specific overrides                      |
+| 4        | **user**     | User's personal settings                        |
+| 5        | **.env**     | Project directory dotenv file                   |
+| 6        | **env vars** | Environment variables                           |
+| 7        | **CLI**      | Command-line `--set` flags (highest priority)   |
 
 **Merge behavior**: Each layer only needs to specify values it wants to override. Unspecified values inherit from lower layers.
 
@@ -41,21 +41,21 @@ Configuration is loaded and merged in the following order (lowest to highest pre
 
 ### Platform-Specific Paths
 
-| Layer    | Linux                                   | macOS                                                              | Windows                                                      |
-|----------|-----------------------------------------|--------------------------------------------------------------------|--------------------------------------------------------------|
-| defaults | (bundled with package)                  | (bundled with package)                                             | (bundled with package)                                       |
-| app      | `/etc/xdg/{slug}/config.toml`           | `/Library/Application Support/{vendor}/{app}/config.toml`          | `C:\ProgramData\{vendor}\{app}\config.toml`                  |
-| host     | `/etc/xdg/{slug}/hosts/{hostname}.toml` | `/Library/Application Support/{vendor}/{app}/hosts/{hostname}.toml`| `C:\ProgramData\{vendor}\{app}\hosts\{hostname}.toml`        |
-| user     | `~/.config/{slug}/config.toml`          | `~/Library/Application Support/{vendor}/{app}/config.toml`         | `%APPDATA%\{vendor}\{app}\config.toml`                       |
+| Layer    | Linux                                   | macOS                                                               | Windows                                               |
+|----------|-----------------------------------------|---------------------------------------------------------------------|-------------------------------------------------------|
+| defaults | (bundled with package)                  | (bundled with package)                                              | (bundled with package)                                |
+| app      | `/etc/xdg/{slug}/config.toml`           | `/Library/Application Support/{vendor}/{app}/config.toml`           | `C:\ProgramData\{vendor}\{app}\config.toml`           |
+| host     | `/etc/xdg/{slug}/hosts/{hostname}.toml` | `/Library/Application Support/{vendor}/{app}/hosts/{hostname}.toml` | `C:\ProgramData\{vendor}\{app}\hosts\{hostname}.toml` |
+| user     | `~/.config/{slug}/config.toml`          | `~/Library/Application Support/{vendor}/{app}/config.toml`          | `%APPDATA%\{vendor}\{app}\config.toml`                |
 
 ### Path Placeholders
 
-| Placeholder  | Linux                        | macOS / Windows              |
-|--------------|------------------------------|------------------------------|
-| `{slug}`     | `hugesitemap`          | (not used)                   |
-| `{vendor}`   | (not used)                   | `bitranox`                   |
-| `{app}`      | (not used)                   | `Sitemap Generator`          |
-| `{hostname}` | System hostname              | System hostname              |
+| Placeholder  | Linux           | macOS / Windows     |
+|--------------|-----------------|---------------------|
+| `{slug}`     | `hugesitemap`   | (not used)          |
+| `{vendor}`   | (not used)      | `bitranox`          |
+| `{app}`      | (not used)      | `Sitemap Generator` |
+| `{hostname}` | System hostname | System hostname     |
 
 ### Concrete Examples
 
@@ -78,14 +78,14 @@ Configuration is loaded and merged in the following order (lowest to highest pre
 
 These options apply to all commands and must be specified **before** the command name:
 
-| Option | Description |
-|--------|-------------|
-| `--version` | Show version and exit. |
-| `--profile NAME` | Load configuration from a named profile (e.g., `production`, `test`). |
+| Option                    | Description                                                               |
+|---------------------------|---------------------------------------------------------------------------|
+| `--version`               | Show version and exit.                                                    |
+| `--profile NAME`          | Load configuration from a named profile (e.g., `production`, `test`).     |
 | `--set SECTION.KEY=VALUE` | Override a configuration setting. Can be repeated for multiple overrides. |
-| `--env-file PATH` | Explicit `.env` file path. Skips the default upward directory search. |
-| `--traceback` | Show full Python traceback on errors (useful for debugging). |
-| `--no-traceback` | Hide traceback, show only error message (default). |
+| `--env-file PATH`         | Explicit `.env` file path. Skips the default upward directory search.     |
+| `--traceback`             | Show full Python traceback on errors (useful for debugging).              |
+| `--no-traceback`          | Hide traceback, show only error message (default).                        |
 
 **Example usage:**
 
@@ -112,11 +112,11 @@ Display the merged configuration from all sources (defaults -> app -> host -> us
 
 #### Options Reference
 
-| Option | Required | Description |
-|--------|:--------:|-------------|
-| `--format` | No | Output format: `human` (default) or `json`. |
-| `--section NAME` | No | Show only a specific section (e.g., `lib_log_rich`, `sitemap`). |
-| `--profile NAME` | No | Load configuration for a specific profile. |
+| Option           | Required | Description                                                     |
+|------------------|:--------:|-----------------------------------------------------------------|
+| `--format`       | No       | Output format: `human` (default) or `json`.                     |
+| `--section NAME` | No       | Show only a specific section (e.g., `lib_log_rich`, `sitemap`). |
+| `--profile NAME` | No       | Load configuration for a specific profile.                      |
 
 #### Examples
 
@@ -143,15 +143,15 @@ Deploy bundled default configuration to platform-specific directories.
 
 #### Options Reference
 
-| Option | Required | Description |
-|--------|:--------:|-------------|
-| `--target` | Yes | Target layer: `app`, `host`, or `user`. Can be specified multiple times. |
-| `--force` | No | Overwrite existing configuration files. Without this, existing files are skipped. |
-| `--profile NAME` | No | Deploy to a profile-specific subdirectory (e.g., `profile/production/`). |
-| `--permissions` | No | Enable Unix permission setting (default). |
-| `--no-permissions` | No | Disable permission setting; use system umask instead. |
-| `--dir-mode MODE` | No | Override directory permissions (octal: `750` or `0o750`). |
-| `--file-mode MODE` | No | Override file permissions (octal: `640` or `0o640`). |
+| Option             | Required | Description                                                                       |
+|--------------------|:--------:|-----------------------------------------------------------------------------------|
+| `--target`         | Yes      | Target layer: `app`, `host`, or `user`. Can be specified multiple times.          |
+| `--force`          | No       | Overwrite existing configuration files. Without this, existing files are skipped. |
+| `--profile NAME`   | No       | Deploy to a profile-specific subdirectory (e.g., `profile/production/`).          |
+| `--permissions`    | No       | Enable Unix permission setting (default).                                         |
+| `--no-permissions` | No       | Disable permission setting; use system umask instead.                             |
+| `--dir-mode MODE`  | No       | Override directory permissions (octal: `750` or `0o750`).                         |
+| `--file-mode MODE` | No       | Override file permissions (octal: `640` or `0o640`).                              |
 
 #### Basic Examples
 
@@ -225,11 +225,11 @@ hugesitemap config-deploy --target user
 
 On Linux and macOS, `config-deploy` sets Unix file permissions based on the target layer. Windows uses ACLs and ignores these settings.
 
-| Target | Directory Mode | File Mode | Description |
-|--------|:--------------:|:---------:|-------------|
-| `app`  | `0o755` (rwxr-xr-x) | `0o644` (rw-r--r--) | World-readable for system-wide config |
+| Target | Directory Mode      | File Mode           | Description                             |
+|--------|:-------------------:|:-------------------:|-----------------------------------------|
+| `app`  | `0o755` (rwxr-xr-x) | `0o644` (rw-r--r--) | World-readable for system-wide config   |
 | `host` | `0o755` (rwxr-xr-x) | `0o644` (rw-r--r--) | World-readable for host-specific config |
-| `user` | `0o700` (rwx------) | `0o600` (rw-------)  | Private to user only |
+| `user` | `0o700` (rwx------) | `0o600` (rw-------) | Private to user only                    |
 
 **Permission options:**
 
@@ -274,10 +274,10 @@ Create example TOML files showing all available options with default values and 
 
 #### Options Reference
 
-| Option | Required | Description |
-|--------|:--------:|-------------|
-| `--destination DIR` | Yes | Directory to write example files. |
-| `--force` | No | Overwrite existing files. Without this, existing files are skipped. |
+| Option              | Required | Description                                                         |
+|---------------------|:--------:|---------------------------------------------------------------------|
+| `--destination DIR` | Yes      | Directory to write example files.                                   |
+| `--force`           | No       | Overwrite existing files. Without this, existing files are skipped. |
 
 #### Examples
 
@@ -294,9 +294,9 @@ hugesitemap config-generate-examples --destination .
 
 #### Generated Files
 
-| File | Description |
-|------|-------------|
-| `config.toml` | Main configuration file with all sections |
+| File              | Description                                                  |
+|-------------------|--------------------------------------------------------------|
+| `config.toml`     | Main configuration file with all sections                    |
 | `config.d/*.toml` | Modular configuration files (sites, layered-config, logging) |
 
 Each file contains commented documentation explaining available options and their default values.
@@ -328,7 +328,7 @@ hugesitemap --set lib_log_rich.console_level=DEBUG --set lib_log_rich.console_fo
 hugesitemap --set sitemap.default_priority=0.7 generate --dry-run
 
 # Override with JSON arrays/objects (use single quotes around the value)
-hugesitemap --set 'sitemap.filters.drop=["*~", "*.log*"]' config
+hugesitemap --set 'sitemap.filters.ignore=["*~", "*.log"]' config
 
 # Combine with profile
 hugesitemap --profile production --set lib_log_rich.console_level=DEBUG config
@@ -340,14 +340,14 @@ through `--set`.
 
 #### Supported Value Types
 
-| Type | Example |
-|------|---------|
-| String | `--set section.key=value` |
-| Integer | `--set section.timeout=30` |
-| Float | `--set section.ratio=0.5` |
-| Boolean | `--set section.enabled=true` or `--set section.enabled=false` |
-| JSON Array | `--set section.items='["a", "b"]'` |
-| JSON Object | `--set section.metadata='{"key": "value"}'` |
+| Type        | Example                                                       |
+|-------------|---------------------------------------------------------------|
+| String      | `--set section.key=value`                                     |
+| Integer     | `--set section.timeout=30`                                    |
+| Float       | `--set section.ratio=0.5`                                     |
+| Boolean     | `--set section.enabled=true` or `--set section.enabled=false` |
+| JSON Array  | `--set section.items='["a", "b"]'`                            |
+| JSON Object | `--set section.metadata='{"key": "value"}'`                   |
 
 ---
 
@@ -382,7 +382,7 @@ gzip             = false
 default_priority = 0.5
 
   [sitemap.filters]
-  drop = ["*~", "re:/\\.[^/]*", "*.txt*", "*.log*"]   # prepended to each site's filters
+  ignore = ["*~", ".*", "*.txt", "*.log"]   # .gitignore patterns, prepended to each site's filters
 
 [[site]]
 name        = "media"                     # unique; used by --site
@@ -400,8 +400,8 @@ default_priority = 0.5                     # optional; inherits [sitemap].defaul
   changefreq = "yearly"
   priority   = 0.1
 
-  [site.filters]                          # appended after the global drops
-  drop = ["*/zsvc/z_content/*"]
+  [site.filters]                          # appended after the global patterns
+  ignore = ["zsvc/"]                      # trailing slash prunes the whole subtree
 
 [[site]]
 name        = "www"
@@ -412,21 +412,23 @@ output_path = "/srv/www/www/sitemap.xml"
 
 ### Settings Reference
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| `[sitemap]` | table | absent | Global defaults shared by all sites (optional). |
-| `[sitemap].gzip` | bool | `false` | Default `gzip`; a site's own value overrides it. |
-| `[sitemap].default_priority` | float | `0.5` | Default priority; a site's own value overrides it. |
-| `[sitemap.filters].drop` | array | `[]` | Drop patterns prepended to every site's own filters. |
-| `[[site]]` | table array | `[]` | One entry per site; `generate` processes all by default. |
-| `name` | string | required | Unique site identifier used by `--site`. |
-| `base_url` | string | required | Site base URL (trailing slash recommended); used to build child sitemap URLs on split. |
-| `output_path` | string | required | Destination path for the generated `sitemap.xml`. |
-| `gzip` | bool | inherits | Write gzip-compressed output (`sitemap.xml.gz`). |
-| `default_priority` | float | inherits | Priority assigned to every walked entry. |
-| `[[site.directory]]` | table array | `[]` | Repeatable: on-disk `path` mapped to `url` (prefix). |
-| `[[site.url]]` | table array | `[]` | Repeatable: explicit `loc` with optional `changefreq` and `priority` (default `0.5`). |
-| `[site.filters].drop` | array | `[]` | Site drop patterns; appended after the global ones. |
+| Key                                     | Type        | Default  | Description                                                                            |
+|-----------------------------------------|-------------|----------|----------------------------------------------------------------------------------------|
+| `[sitemap]`                             | table       | absent   | Global defaults shared by all sites (optional).                                        |
+| `[sitemap].gzip`                        | bool        | `false`  | Default `gzip`; a site's own value overrides it.                                       |
+| `[sitemap].default_priority`            | float       | `0.5`    | Default priority; a site's own value overrides it.                                     |
+| `[sitemap.filters].ignore`              | array       | `[]`     | `.gitignore` patterns prepended to every site's own.                                   |
+| `[[site]]`                              | table array | `[]`     | One entry per site; `generate` processes all by default.                               |
+| `name`                                  | string      | required | Unique site identifier used by `--site`.                                               |
+| `base_url`                              | string      | required | Site base URL (trailing slash recommended); used to build child sitemap URLs on split. |
+| `output_path`                           | string      | required | Destination path for the generated `sitemap.xml`.                                      |
+| `gzip`                                  | bool        | inherits | Write gzip-compressed output (`sitemap.xml.gz`).                                       |
+| `default_priority`                      | float       | inherits | Priority assigned to every walked entry.                                               |
+| `[[site.directory]]`                    | table array | `[]`     | Repeatable: on-disk `path` mapped to `url` (prefix).                                   |
+| `[[site.url]]`                          | table array | `[]`     | Repeatable: explicit `loc` with optional `changefreq` and `priority` (default `0.5`).  |
+| `[site.filters].ignore`                 | array       | `[]`     | Site `.gitignore` patterns; appended after the global ones.                            |
+| `[site.filters].ignore_file`            | string      | absent   | Path to a `.gitignore`-format rule file for this site.                                 |
+| `[site.filters].nested_ignore_filename` | string      | absent   | Per-directory ignore filename to discover within each tree (e.g. `.sitemapignore`).    |
 
 Unknown keys are rejected: each table is validated with `extra="forbid"`, so a
 typo in a key name raises a configuration error rather than being ignored.
@@ -439,22 +441,33 @@ different merge rules:
 - **Scalars override.** `gzip` and `default_priority` resolve as: the site's own
   value wins; otherwise the global `[sitemap]` value; otherwise the built-in
   default (`gzip=false`, `default_priority=0.5`).
-- **Filters extend (not replace).** The global `[sitemap.filters].drop` patterns
-  are **prepended** to each site's own `[site.filters].drop` (global patterns
-  first, then the site's own). The resolved drop list is the concatenation of the
-  two. Common junk patterns are written once globally; each site lists only its
-  extras. The trade-off is deliberate: a site cannot remove an individual global
-  pattern.
+- **Filters extend (not replace).** The global `[sitemap.filters].ignore`
+  patterns are **prepended** to each site's own `[site.filters].ignore` (global
+  patterns first, then the site's own). `ignore_file` and
+  `nested_ignore_filename` use the site's value, falling back to the global.
+  Common junk patterns are written once globally; each site lists only its extras.
+  Because matching is last-match-wins, a site can re-include a globally ignored
+  path with a `!` negation.
 
-### Drop Filters
+### Filters (gitignore semantics)
 
-`drop` is an **ordered** list of patterns. A path is dropped when any pattern
-matches it (matched against the path relative to its directory root, with a
-leading `/`). Dropped directories are pruned, so their entire subtree is skipped.
+Filtering uses git `.gitignore` matching via
+[`igittigitt`](https://github.com/bitranox/igittigitt). Three rule sources apply
+in precedence order (later wins): inline `ignore` patterns, then `ignore_file`,
+then any per-directory `nested_ignore_filename` files discovered within the tree.
 
-- Patterns are shell wildcards by default (`*`, `?`, character classes).
-- Prefix a pattern with `re:` to use a regular expression instead
-  (e.g. `re:/\\.[^/]*` to drop hidden dotfiles).
+- Patterns are anchored at each `[[site.directory]]` root (a leading `/` anchors,
+  no slash matches at any depth, `**` spans directories).
+- A trailing-slash pattern (`zsvc/`) matches a directory and prunes its **whole
+  subtree** - the walk never descends into it.
+- `!pattern` re-includes. To index **only** one kind of file, invert with an
+  allowlist: `ignore = ["*", "!*/", "!*.html"]` keeps just `.html` (`!*/` keeps
+  directories so the walk can descend). Like git, a file under an ignored
+  directory cannot be re-included.
+- `ignore_file` points to a `.gitignore`-format file (absolute path recommended);
+  a missing file raises a configuration error.
+- `nested_ignore_filename` (for example `.sitemapignore`) makes each subtree carry
+  its own rules, git-style - useful for very large, heterogeneous trees.
 
 ### Selecting Sites
 
@@ -478,13 +491,13 @@ Profiles provide isolated configuration namespaces for different environments (e
 
 Profile names are validated for security and cross-platform compatibility (via `lib_layered_config.validate_profile_name`):
 
-| Rule | Description |
-|------|-------------|
-| **Maximum length** | 64 characters |
-| **Allowed characters** | ASCII letters (`a-z`, `A-Z`), digits (`0-9`), hyphens (`-`), underscores (`_`) |
-| **Start character** | Must start with a letter or digit (not `-` or `_`) |
-| **Reserved names** | Windows reserved names rejected: `CON`, `PRN`, `AUX`, `NUL`, `COM1`-`COM9`, `LPT1`-`LPT9` |
-| **Path safety** | No path separators (`/`, `\`) or traversal sequences (`..`) |
+| Rule                   | Description                                                                               |
+|------------------------|-------------------------------------------------------------------------------------------|
+| **Maximum length**     | 64 characters                                                                             |
+| **Allowed characters** | ASCII letters (`a-z`, `A-Z`), digits (`0-9`), hyphens (`-`), underscores (`_`)            |
+| **Start character**    | Must start with a letter or digit (not `-` or `_`)                                        |
+| **Reserved names**     | Windows reserved names rejected: `CON`, `PRN`, `AUX`, `NUL`, `COM1`-`COM9`, `LPT1`-`LPT9` |
+| **Path safety**        | No path separators (`/`, `\`) or traversal sequences (`..`)                               |
 
 **Valid examples:** `production`, `staging-v2`, `test_env`, `dev01`
 
@@ -514,10 +527,10 @@ Profile names are validated for security and cross-platform compatibility (via `
 
 Profile directories are **separate namespaces**. Configuration deployed with a profile is only visible when reading with that same profile.
 
-| Command                         | Sees `app` layer?                  | Sees `user` layer?                 |
-|---------------------------------|------------------------------------|------------------------------------|
-| `config` (no profile)           | Only if deployed without profile   | Only if deployed without profile   |
-| `config --profile production`   | Only if deployed with `production` | Only if deployed with `production` |
+| Command                       | Sees `app` layer?                  | Sees `user` layer?                 |
+|-------------------------------|------------------------------------|------------------------------------|
+| `config` (no profile)         | Only if deployed without profile   | Only if deployed without profile   |
+| `config --profile production` | Only if deployed with `production` | Only if deployed with `production` |
 
 **Example**: If you deploy `app` with `--profile production` but `user` without a profile:
 
@@ -588,11 +601,11 @@ The file must exist and be readable; Click validates this before the command run
 
 The `defaultconfig.toml` and the files in `defaultconfig.d/` (bundled with the package) provide baseline values. These serve as the fallback when no external configuration files are deployed.
 
-| File | Purpose |
-|------|---------|
-| `30-sites.toml` | Sitemap site definitions (`[sitemap]` + `[[site]]`); ships with no sites |
-| `40-layered-config.toml` | `lib_layered_config` integration and deploy-permission defaults |
-| `90-logging.toml` | `lib_log_rich` logging defaults |
+| File                     | Purpose                                                                  |
+|--------------------------|--------------------------------------------------------------------------|
+| `30-sites.toml`          | Sitemap site definitions (`[sitemap]` + `[[site]]`); ships with no sites |
+| `40-layered-config.toml` | `lib_layered_config` integration and deploy-permission defaults          |
+| `90-logging.toml`        | `lib_log_rich` logging defaults                                          |
 
 Because the files in `defaultconfig.d/` are siblings of `defaultconfig.toml`,
 `lib_layered_config` discovers and merges them automatically.

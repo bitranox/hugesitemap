@@ -20,7 +20,7 @@ from pathlib import Path
 from lib_layered_config import Config
 
 from hugesitemap.adapters.config.site_loader import SiteConfig, load_sites
-from hugesitemap.domain.filters import Matcher
+from hugesitemap.domain.filters import FilterSpec
 from hugesitemap.domain.model import SitemapDocument, SitemapEntry
 
 
@@ -35,7 +35,7 @@ class InMemoryContentSource:
         *,
         root: str,
         url_prefix: str,
-        matchers: tuple[Matcher, ...],
+        filter_spec: FilterSpec,
         default_priority: float,
     ) -> list[SitemapEntry]:
         """Return the entries registered for ``root`` (empty if none)."""
@@ -46,7 +46,7 @@ def content_source_empty(
     *,
     root: str,
     url_prefix: str,
-    matchers: tuple[Matcher, ...],
+    filter_spec: FilterSpec,
     default_priority: float,
 ) -> list[SitemapEntry]:
     """A content source that yields nothing (default for build_testing)."""

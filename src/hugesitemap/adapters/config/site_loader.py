@@ -45,11 +45,22 @@ class ExplicitUrl(BaseModel):
 
 
 class FilterConfig(BaseModel):
-    """The ordered drop-filter list."""
+    """The ``[site.filters]`` / ``[sitemap.filters]`` block.
+
+    Filtering uses git ``.gitignore`` semantics (via ``igittigitt``).
+
+    Attributes:
+        ignore: Inline ``.gitignore`` patterns, anchored at each directory root.
+        ignore_file: Optional path to a ``.gitignore``-format rule file.
+        nested_ignore_filename: Optional per-directory ignore filename discovered
+            throughout each scanned tree (for example ``.sitemapignore``).
+    """
 
     model_config = ConfigDict(extra="forbid")
 
-    drop: list[str] = Field(default_factory=list)
+    ignore: list[str] = Field(default_factory=list)
+    ignore_file: str | None = None
+    nested_ignore_filename: str | None = None
 
 
 def _no_directories() -> list[DirectorySpec]:
@@ -95,21 +106,22 @@ class SitemapDefaults(BaseModel):
     taken from here when a site omits them, and a site value wins when present.
 
     Filters use **extend** semantics (a deliberate choice, not replace): the
-    global ``[sitemap.filters].drop`` patterns are prepended to every site's own
-    ``[site.filters].drop`` (global first, then the site's own). The resolved
-    drop list is the concatenation of the two.
+    global ``[sitemap.filters].ignore`` patterns are prepended to every site's
+    own ``[site.filters].ignore`` (global first, then the site's own). Because
+    gitignore matching is last-match-wins, prepending lets a site re-include a
+    globally-ignored path with a ``!`` negation. ``ignore_file`` and
+    ``nested_ignore_filename`` fall back to the global value when the site omits
+    them.
 
     Rationale for extend over replace: sites share a common base of junk patterns
-    (``*~``, hidden dotfiles, ``*.txt*`` ...) and each adds only a few extras.
+    (``*~``, hidden dotfiles, ``*.txt`` ...) and each adds only a few extras.
     Replace semantics would force every site to repeat the whole base just to add
-    one pattern - the duplication this section exists to remove. The accepted
-    trade-off is that a site cannot drop an individual global pattern; to allow
-    that, change :func:`_extend_filters` to replace instead of concatenate.
+    one pattern - the duplication this section exists to remove.
 
     Attributes:
         gzip: Default gzip setting for sites that omit ``gzip``.
         default_priority: Default priority for sites that omit ``default_priority``.
-        filters: Drop filters prepended to every site's own filters.
+        filters: Filters prepended to / inherited by every site's own filters.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -148,16 +160,22 @@ def _with_scalar_defaults(item: Any, defaults: SitemapDefaults) -> Any:
 
 
 def _extend_filters(site: SiteConfig, defaults: SitemapDefaults) -> SiteConfig:
-    """Prepend the global drop filters to a site's own filters.
+    """Merge the global filters into a site's own filters.
 
     Extend, not replace (deliberate; see :class:`SitemapDefaults`): the resolved
-    drop list is ``global drops + site drops``. To switch to replace semantics,
-    return the global drops only when the site defines no filters of its own.
+    ignore list is ``global ignore + site ignore`` (global first, so a site can
+    override a global pattern with a ``!`` negation). ``ignore_file`` and
+    ``nested_ignore_filename`` use the site value, falling back to the global.
     """
-    if not defaults.filters.drop:
+    glob = defaults.filters
+    merged = FilterConfig(
+        ignore=[*glob.ignore, *site.filters.ignore],
+        ignore_file=site.filters.ignore_file or glob.ignore_file,
+        nested_ignore_filename=site.filters.nested_ignore_filename or glob.nested_ignore_filename,
+    )
+    if merged == site.filters:
         return site
-    combined = [*defaults.filters.drop, *site.filters.drop]
-    return site.model_copy(update={"filters": FilterConfig(drop=combined)})
+    return site.model_copy(update={"filters": merged})
 
 
 def load_sites(config: Config) -> list[SiteConfig]:

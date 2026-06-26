@@ -14,13 +14,18 @@
 
 # Global defaults shared by every site. Scalars (gzip, default_priority) are
 # inherited unless a site overrides them; the global filters are PREPENDED to
-# each site's own filters (extend), so the common drops live here only once.
+# each site's own filters (extend), so the common excludes live here only once.
+#
+# Filtering uses git .gitignore semantics (via igittigitt): patterns are anchored
+# at each directory root, a trailing slash ("drafts/") prunes a whole subtree, and
+# "!pattern" re-includes. To index ONLY one kind, invert: ignore = ["*", "!*/",
+# "!*.html"] keeps just .html (the "!*/" keeps directories so the walk descends).
 [sitemap]
 gzip             = false
 default_priority = 0.5
 
   [sitemap.filters]
-  drop = ["*~", "re:/\\.[^/]*", "*.txt*", "*.log*", "*.py*"]
+  ignore = ["*~", ".*", "*.txt", "*.log", "*.py"]
 
 [[site]]
 name        = "docs"
@@ -41,8 +46,9 @@ output_path = "/srv/www/docs/sitemap.xml"
   priority   = 1.0
 
   [site.filters]
-  # Appended after the global drops above; only the docs-specific extra here.
-  drop = ["*/drafts/*"]
+  # Appended after the global patterns above; only the docs-specific extra here.
+  # Trailing slash makes "drafts/" prune the directory and its whole subtree.
+  ignore = ["drafts/"]
 
 [[site]]
 name        = "files"

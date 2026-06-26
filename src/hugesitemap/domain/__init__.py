@@ -8,7 +8,7 @@ Contents:
     * :mod:`.model` - Sitemap value objects (entries, documents, index entries)
     * :mod:`.enums` - Domain enumerations (ChangeFreq, OutputFormat, DeployTarget)
     * :mod:`.errors` - Domain exception types
-    * :mod:`.filters` - Ordered wildcard/regexp drop-filter engine
+    * :mod:`.filters` - Path-exclusion value object (gitignore semantics)
     * :mod:`.formatting` - ISO8601, priority, and URL formatting helpers
     * :mod:`.limits` - Sitemap size limits and entry chunking
 """
@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from .enums import ChangeFreq, DeployTarget, OutputFormat
 from .errors import ConfigurationError, SitemapValidationError
-from .filters import Matcher, compile_filters, is_dropped
+from .filters import FilterSpec
 from .formatting import format_priority, iso8601_z, join_url, mtime_to_utc
 from .limits import MAX_BYTES, MAX_URLS
 from .model import SitemapDocument, SitemapEntry, SitemapIndexEntry
@@ -35,9 +35,7 @@ __all__ = [
     "ConfigurationError",
     "SitemapValidationError",
     # Filters
-    "Matcher",
-    "compile_filters",
-    "is_dropped",
+    "FilterSpec",
     # Formatting
     "format_priority",
     "iso8601_z",

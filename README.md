@@ -28,7 +28,8 @@ the low hundreds of MB on any server; only the output file on disk grows. See
   directory URLs (trailing slash, the directory's own mtime) and file URLs.
 - `<lastmod>` from each entry's real mtime in ISO8601 UTC (`...Z`), 4-decimal
   `<priority>`, and explicit `[[url]]` entries with their own changefreq/priority.
-- Ordered drop filters supporting shell wildcards and `re:`-prefixed regexps.
+- Git `.gitignore`-style filters (via `igittigitt`): anchored patterns, subtree
+  pruning, `!` allowlists, optional per-directory `.sitemapignore` files.
 - 50,000-URL split into a sitemap index plus numbered child sitemaps.
 - Optional gzip output (libdeflate at maximum ratio - smallest standard-gzip
   `.gz` for a write-once, serve-many file); atomic write with lxml re-parse
@@ -242,11 +243,11 @@ how large the site is - dominated by a single chunk, not the total URL count.
 
 Measured peak RSS on a typical machine (realistic ~50-character URLs):
 
-| URLs | Peak RSS | Output on disk |
-|------|----------|----------------|
-| 50,000 | ~135 MB | 8 MB |
-| 1,000,000 | ~160 MB | 154 MB |
-| 5,000,000 | ~160 MB | 770 MB |
+| URLs      | Peak RSS | Output on disk |
+|-----------|----------|----------------|
+| 50,000    | ~135 MB  | 8 MB           |
+| 1,000,000 | ~160 MB  | 154 MB         |
+| 5,000,000 | ~160 MB  | 770 MB         |
 
 So even on a big server generating millions of URLs, the process stays in the
 low hundreds of MB; only the output file grows. (Naively buffering every entry
@@ -264,7 +265,7 @@ gzip             = false
 default_priority = 0.5
 
   [sitemap.filters]
-  drop = ["*~", "re:/\\.[^/]*", "*.txt*", "*.log*", "*.py*"]   # prepended to each site's filters
+  ignore = ["*~", ".*", "*.txt", "*.log", "*.py"]   # .gitignore patterns, prepended to each site's filters
 
 [[site]]
 name        = "media"                     # unique; used by --site
@@ -280,8 +281,8 @@ output_path = "/srv/www/media/sitemap.xml"
   changefreq = "yearly"
   priority   = 0.1
 
-  [site.filters]                          # appended after the global drops
-  drop = ["*/zsvc/z_content/*"]
+  [site.filters]                          # appended after the global patterns
+  ignore = ["zsvc/"]                      # trailing slash prunes the whole subtree
 
 [[site]]
 name        = "www"
@@ -292,30 +293,37 @@ output_path = "/srv/www/www/sitemap.xml"
 
 The optional `[sitemap]` section holds global defaults. Scalars (`gzip`,
 `default_priority`) are inherited unless a site overrides them. Filters
-**extend rather than replace**: the global drop patterns are prepended to each
-site's own filters, so common drop patterns are written once and each site lists
-only its extras. (A site therefore cannot remove an individual global pattern;
-this is intentional for shared junk filters.)
+**extend rather than replace**: the global `ignore` patterns are prepended to
+each site's own, so common patterns are written once and each site lists only its
+extras. Because matching is last-match-wins, a site can re-include a globally
+ignored path with a `!` negation.
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| `[sitemap]` | table | absent | Global defaults shared by all sites (optional). |
-| `[sitemap].gzip` | bool | `false` | Default `gzip`; a site's own value overrides it. |
-| `[sitemap].default_priority` | float | `0.5` | Default priority; a site's own value overrides it. |
-| `[sitemap.filters].drop` | array | `[]` | Drop patterns prepended to every site's own filters. |
-| `[[site]]` | table array | `[]` | One entry per site; `generate` processes all by default. |
-| `name` | string | required | Unique site identifier used by `--site`. |
-| `base_url` | string | required | Site base URL; used to build child sitemap URLs on split. |
-| `output_path` | string | required | Destination path for `sitemap.xml`. |
-| `gzip` | bool | inherits | Write gzip-compressed output (`sitemap.xml.gz`). |
-| `default_priority` | float | inherits | Priority assigned to every walked entry. |
-| `[[site.directory]]` | table array | `[]` | `path` (on disk) mapped to `url` (prefix). |
-| `[[site.url]]` | table array | `[]` | Explicit `loc` with optional `changefreq`/`priority`. |
-| `[site.filters].drop` | array | `[]` | Site drop patterns; appended after the global ones. |
+| Key                                     | Type        | Default  | Description                                                        |
+|-----------------------------------------|-------------|----------|--------------------------------------------------------------------|
+| `[sitemap]`                             | table       | absent   | Global defaults shared by all sites (optional).                    |
+| `[sitemap].gzip`                        | bool        | `false`  | Default `gzip`; a site's own value overrides it.                   |
+| `[sitemap].default_priority`            | float       | `0.5`    | Default priority; a site's own value overrides it.                 |
+| `[sitemap.filters].ignore`              | array       | `[]`     | `.gitignore` patterns prepended to every site's own.               |
+| `[[site]]`                              | table array | `[]`     | One entry per site; `generate` processes all by default.           |
+| `name`                                  | string      | required | Unique site identifier used by `--site`.                           |
+| `base_url`                              | string      | required | Site base URL; used to build child sitemap URLs on split.          |
+| `output_path`                           | string      | required | Destination path for `sitemap.xml`.                                |
+| `gzip`                                  | bool        | inherits | Write gzip-compressed output (`sitemap.xml.gz`).                   |
+| `default_priority`                      | float       | inherits | Priority assigned to every walked entry.                           |
+| `[[site.directory]]`                    | table array | `[]`     | `path` (on disk) mapped to `url` (prefix).                         |
+| `[[site.url]]`                          | table array | `[]`     | Explicit `loc` with optional `changefreq`/`priority`.              |
+| `[site.filters].ignore`                 | array       | `[]`     | Site `.gitignore` patterns; appended after the global ones.        |
+| `[site.filters].ignore_file`            | string      | absent   | Path to a `.gitignore`-format rule file for this site.             |
+| `[site.filters].nested_ignore_filename` | string      | absent   | Per-directory ignore filename to discover (e.g. `.sitemapignore`). |
 
-A path is dropped when any `drop` pattern matches it (patterns are matched
-against the path relative to its directory root, with a leading `/`). Dropped
-directories are pruned, so their entire subtree is skipped.
+Filtering uses git `.gitignore` semantics (via
+[`igittigitt`](https://github.com/bitranox/igittigitt)): patterns are anchored at
+each directory root, a trailing-slash pattern (`zsvc/`) prunes a whole subtree, and
+`!pattern` re-includes. Ignored directories are pruned, so their entire subtree is
+skipped. To index **only** one kind of file, invert with an allowlist:
+`ignore = ["*", "!*/", "!*.html"]` keeps just `.html` (the `!*/` keeps directories
+so the walk can descend). Like git, a file under an ignored directory cannot be
+re-included.
 
 > **Keep all sites in one layer.** `lib_layered_config` deep-merges nested
 > tables but replaces lists wholesale (last writer wins), so a higher layer
@@ -333,6 +341,7 @@ from hugesitemap.application.generate import (
     GenerateRequest,
     generate_sitemap,
 )
+from hugesitemap.domain.filters import FilterSpec
 from hugesitemap.domain.model import SitemapEntry
 
 for site in load_sites(get_config()):
@@ -346,7 +355,11 @@ for site in load_sites(get_config()):
             SitemapEntry(loc=u.loc, lastmod=None, priority=u.priority, changefreq=u.changefreq)
             for u in site.explicit_urls
         ),
-        drop_patterns=tuple(site.filters.drop),
+        filter_spec=FilterSpec(
+            patterns=tuple(site.filters.ignore),
+            ignore_file=site.filters.ignore_file,
+            nested_filename=site.filters.nested_ignore_filename,
+        ),
     )
     result = generate_sitemap(request, content_source=walk_directory, write_sitemap=write_sitemap)
     print(site.name, result.url_count, result.paths_written)

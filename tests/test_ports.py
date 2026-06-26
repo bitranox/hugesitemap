@@ -22,7 +22,7 @@ from hugesitemap.adapters.memory import (
     init_logging_in_memory,
     load_sites_in_memory,
 )
-from hugesitemap.domain.filters import compile_filters
+from hugesitemap.domain.filters import FilterSpec
 from hugesitemap.domain.model import SitemapDocument, SitemapEntry
 
 if TYPE_CHECKING:
@@ -97,7 +97,7 @@ def test_content_source_returns_iterable_of_entries() -> None:
     entry = SitemapEntry(loc="https://x.test/a/", lastmod=None, priority=0.5)
     source = InMemoryContentSource({"/data/a": [entry]})
     result = list(
-        source(root="/data/a", url_prefix="https://x.test/a/", matchers=compile_filters(()), default_priority=0.5)
+        source(root="/data/a", url_prefix="https://x.test/a/", filter_spec=FilterSpec(), default_priority=0.5)
     )
     assert result == [entry]
 
@@ -106,7 +106,7 @@ def test_content_source_returns_iterable_of_entries() -> None:
 def test_empty_content_source_yields_nothing(content_source_impl: ContentSource) -> None:
     """The default in-memory ContentSource yields no entries."""
     result = list(
-        content_source_impl(root="/x", url_prefix="https://x/", matchers=compile_filters(()), default_priority=0.5)
+        content_source_impl(root="/x", url_prefix="https://x/", filter_spec=FilterSpec(), default_priority=0.5)
     )
     assert result == []
 

@@ -6,6 +6,31 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-06-27
+
+Filters now use git `.gitignore` semantics (via `igittigitt`).
+
+### Changed (BREAKING)
+- The filter configuration moved from custom drop patterns to `.gitignore`
+  syntax. `[sitemap.filters].drop` / `[site.filters].drop` are replaced by
+  `[sitemap.filters].ignore` / `[site.filters].ignore`, and the `re:`-prefixed
+  regexp form is removed. Convert patterns to gitignore syntax: an anchored
+  hidden-dotfile regexp `re:/\.[^/]*` becomes `.*`, a content wildcard
+  `*/zsvc/z_content/*` becomes a directory pattern such as `zsvc/z_content/`.
+  Global `ignore` patterns are still prepended (extend) to each site's own.
+- `GenerateRequest.drop_patterns` (tuple of strings) is replaced by
+  `GenerateRequest.filter_spec` (a `FilterSpec`); the `ContentSource` port takes
+  `filter_spec` instead of `matchers`. The domain `Matcher`, `compile_filters`,
+  and `is_dropped` are removed in favour of the `FilterSpec` value object.
+
+### Added
+- `[site.filters].ignore_file`: point a site at a `.gitignore`-format rule file.
+- `[site.filters].nested_ignore_filename`: discover per-directory ignore files
+  (e.g. `.sitemapignore`) throughout each scanned tree, git-style - scales to
+  very large, heterogeneous trees.
+- Allowlist filtering via `!` negation (e.g. `["*", "!*/", "!*.html"]` indexes
+  only `.html`), and directory-subtree pruning via trailing-slash patterns.
+
 ## [1.0.0] - 2026-06-25
 
 Initial public release.

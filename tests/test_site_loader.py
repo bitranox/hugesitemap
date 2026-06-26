@@ -16,7 +16,7 @@ MEDIA: dict[str, Any] = {
     "output_path": "/out/media.xml",
     "directory": [{"path": "/data/a000", "url": "https://media.test/a000/"}],
     "url": [{"loc": "https://media.test/index.html", "changefreq": "yearly", "priority": 0.1}],
-    "filters": {"drop": ["*~", "re:/\\.[^/]*"]},
+    "filters": {"ignore": ["*~", ".*"]},
 }
 WWW: dict[str, Any] = {"name": "www", "base_url": "https://www.test/", "output_path": "/out/www.xml"}
 
@@ -36,7 +36,7 @@ def test_loads_multiple_sites() -> None:
     assert media.base_url == "https://media.test/"
     assert media.directories[0].path == "/data/a000"
     assert media.explicit_urls[0].changefreq == "yearly"
-    assert media.filters.drop == ["*~", r"re:/\.[^/]*"]
+    assert media.filters.ignore == ["*~", ".*"]
 
 
 def test_no_site_key_returns_empty() -> None:
@@ -70,19 +70,21 @@ def test_defaults_applied() -> None:
     assert site.gzip is False
     assert site.default_priority == 0.5
     assert site.directories == []
-    assert site.filters.drop == []
+    assert site.filters.ignore == []
+    assert site.filters.ignore_file is None
+    assert site.filters.nested_ignore_filename is None
 
 
 # --- global [sitemap] defaults --------------------------------------------
 
 
 def test_global_defaults_inherited_by_sites() -> None:
-    defaults = {"gzip": True, "default_priority": 0.7, "filters": {"drop": ["*~"]}}
+    defaults = {"gzip": True, "default_priority": 0.7, "filters": {"ignore": ["*~"]}}
     sites = load_sites(_config_with(defaults, WWW))
     site = sites[0]
     assert site.gzip is True
     assert site.default_priority == 0.7
-    assert site.filters.drop == ["*~"]  # inherited; site has no filters of its own
+    assert site.filters.ignore == ["*~"]  # inherited; site has no filters of its own
 
 
 def test_site_overrides_global_scalars() -> None:
@@ -94,22 +96,36 @@ def test_site_overrides_global_scalars() -> None:
 
 
 def test_global_filters_extend_site_filters() -> None:
-    defaults = {"filters": {"drop": ["*~", "*.log*"]}}
-    site = {**WWW, "filters": {"drop": ["*.tmp*"]}}
+    defaults = {"filters": {"ignore": ["*~", "*.log"]}}
+    site = {**WWW, "filters": {"ignore": ["*.tmp"]}}
     sites = load_sites(_config_with(defaults, site))
     # Global patterns first, then the site's own.
-    assert sites[0].filters.drop == ["*~", "*.log*", "*.tmp*"]
+    assert sites[0].filters.ignore == ["*~", "*.log", "*.tmp"]
 
 
 def test_global_filters_apply_when_site_has_none() -> None:
-    defaults = {"filters": {"drop": ["*~"]}}
+    defaults = {"filters": {"ignore": ["*~"]}}
     sites = load_sites(_config_with(defaults, WWW))
-    assert sites[0].filters.drop == ["*~"]
+    assert sites[0].filters.ignore == ["*~"]
 
 
 def test_no_global_filters_leaves_site_filters_untouched() -> None:
-    sites = load_sites(_config_with({"gzip": True}, {**WWW, "filters": {"drop": ["*.tmp*"]}}))
-    assert sites[0].filters.drop == ["*.tmp*"]
+    sites = load_sites(_config_with({"gzip": True}, {**WWW, "filters": {"ignore": ["*.tmp"]}}))
+    assert sites[0].filters.ignore == ["*.tmp"]
+
+
+def test_global_ignore_file_and_nested_inherited() -> None:
+    defaults = {"filters": {"ignore_file": "/etc/rules.gitignore", "nested_ignore_filename": ".sitemapignore"}}
+    sites = load_sites(_config_with(defaults, WWW))
+    assert sites[0].filters.ignore_file == "/etc/rules.gitignore"
+    assert sites[0].filters.nested_ignore_filename == ".sitemapignore"
+
+
+def test_site_ignore_file_overrides_global() -> None:
+    defaults = {"filters": {"ignore_file": "/etc/global.gitignore"}}
+    site = {**WWW, "filters": {"ignore_file": "/srv/site.gitignore"}}
+    sites = load_sites(_config_with(defaults, site))
+    assert sites[0].filters.ignore_file == "/srv/site.gitignore"
 
 
 def test_invalid_global_section_raises() -> None:

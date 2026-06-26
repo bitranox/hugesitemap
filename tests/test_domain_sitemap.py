@@ -11,10 +11,9 @@ from hypothesis import strategies as st
 from hugesitemap.domain import (
     MAX_URLS,
     ChangeFreq,
+    FilterSpec,
     SitemapEntry,
-    compile_filters,
     format_priority,
-    is_dropped,
     iso8601_z,
     join_url,
     mtime_to_utc,
@@ -79,37 +78,28 @@ def test_join_url_no_double_slash_at_boundary(segment: str, relpath: str) -> Non
     assert "//" not in after_scheme
 
 
-# --- filters --------------------------------------------------------------
+# --- filters (FilterSpec value object) ------------------------------------
 
 
-def test_wildcard_drop_matches_suffix() -> None:
-    matchers = compile_filters(("*~",))
-    assert is_dropped("file.txt~", matchers)
-    assert not is_dropped("file.txt", matchers)
+def test_filter_spec_defaults_are_empty() -> None:
+    spec = FilterSpec()
+    assert spec.patterns == ()
+    assert spec.ignore_file is None
+    assert spec.nested_filename is None
+    assert spec.is_empty
 
 
-def test_regex_drop_matches_hidden_dotfiles() -> None:
-    matchers = compile_filters((r"re:/\.[^/]*",))
-    assert is_dropped(".hidden", matchers)
-    assert is_dropped("sub/.secret", matchers)
-    assert not is_dropped("sub/visible.pdf", matchers)
+def test_filter_spec_with_any_source_is_not_empty() -> None:
+    assert not FilterSpec(patterns=("*~",)).is_empty
+    assert not FilterSpec(ignore_file="/etc/rules").is_empty
+    assert not FilterSpec(nested_filename=".sitemapignore").is_empty
 
 
-def test_filters_apply_in_order_any_match_drops() -> None:
-    matchers = compile_filters(("*.txt*", "*.log*", "*/zsvc/z_content/*"))
-    assert is_dropped("notes.txt", matchers)
-    assert is_dropped("server.log.1", matchers)
-    assert is_dropped("a000/zsvc/z_content/x.pdf", matchers)
-    assert not is_dropped("a000/keep.pdf", matchers)
-
-
-def test_empty_filters_drop_nothing() -> None:
-    assert not is_dropped("anything/here.pdf", compile_filters(()))
-
-
-def test_filters_normalise_backslashes() -> None:
-    matchers = compile_filters(("*/zsvc/*",))
-    assert is_dropped("a000\\zsvc\\file.pdf", matchers)
+def test_filter_spec_is_frozen_and_hashable() -> None:
+    spec = FilterSpec(patterns=("*.txt", ".*"))
+    assert hash(spec) == hash(FilterSpec(patterns=("*.txt", ".*")))
+    with pytest.raises(AttributeError):
+        spec.patterns = ()  # type: ignore[misc]
 
 
 # --- limits ---------------------------------------------------------------

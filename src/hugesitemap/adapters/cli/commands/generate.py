@@ -26,6 +26,7 @@ from hugesitemap.application.generate import (
     generate_sitemap,
 )
 from hugesitemap.domain.errors import ConfigurationError, SitemapValidationError
+from hugesitemap.domain.filters import FilterSpec
 from hugesitemap.domain.model import SitemapEntry
 
 from ..constants import CLICK_CONTEXT_SETTINGS
@@ -48,6 +49,11 @@ def _build_request(site: SiteConfig, *, gzip: bool, dry_run: bool) -> GenerateRe
     explicit = tuple(
         SitemapEntry(loc=u.loc, lastmod=None, priority=u.priority, changefreq=u.changefreq) for u in site.explicit_urls
     )
+    filter_spec = FilterSpec(
+        patterns=tuple(site.filters.ignore),
+        ignore_file=site.filters.ignore_file,
+        nested_filename=site.filters.nested_ignore_filename,
+    )
     return GenerateRequest(
         base_url=site.base_url,
         output_path=site.output_path,
@@ -55,7 +61,7 @@ def _build_request(site: SiteConfig, *, gzip: bool, dry_run: bool) -> GenerateRe
         default_priority=site.default_priority,
         directories=directories,
         explicit_entries=explicit,
-        drop_patterns=tuple(site.filters.drop),
+        filter_spec=filter_spec,
         dry_run=dry_run,
     )
 
@@ -138,6 +144,10 @@ def _generate_one(services: AppServices, site: SiteConfig, *, gzip: bool, dry_ru
         logger.error("Sitemap validation failed for %s: %s", site.name, exc)
         click.echo(f"\nError [{site.name}]: {exc}", err=True)
         raise SystemExit(ExitCode.GENERAL_ERROR) from exc
+    except ConfigurationError as exc:
+        logger.error("Configuration error for %s: %s", site.name, exc)
+        click.echo(f"\nError [{site.name}]: {exc}", err=True)
+        raise SystemExit(ExitCode.CONFIG_ERROR) from exc
     _report(site, result, dry_run=dry_run)
 
 

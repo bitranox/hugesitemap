@@ -24,12 +24,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from ..domain.filters import compile_filters
+from ..domain.filters import FilterSpec
 from ..domain.limits import MAX_URLS
 from ..domain.model import SitemapDocument, SitemapEntry
 
 if TYPE_CHECKING:
-    from ..domain.filters import Matcher
     from .ports import ContentSource, SitemapWriter
 
 
@@ -57,7 +56,7 @@ class GenerateRequest:
         default_priority: Priority assigned to every walked entry.
         directories: Configured directories to walk.
         explicit_entries: Extra entries from ``[[url]]`` config blocks.
-        drop_patterns: Ordered filter patterns (wildcard or ``re:``).
+        filter_spec: Path-exclusion rules (gitignore semantics).
         dry_run: When true, walk and count but do not write.
     """
 
@@ -67,7 +66,7 @@ class GenerateRequest:
     default_priority: float
     directories: tuple[DirectoryRequest, ...]
     explicit_entries: tuple[SitemapEntry, ...] = ()
-    drop_patterns: tuple[str, ...] = ()
+    filter_spec: FilterSpec = field(default_factory=FilterSpec)
     dry_run: bool = False
 
 
@@ -97,14 +96,13 @@ class _StreamStats:
 def _iter_entries(
     request: GenerateRequest,
     content_source: ContentSource,
-    matchers: tuple[Matcher, ...],
 ) -> Iterator[SitemapEntry]:
     """Yield every entry for the request, one at a time (no materialisation)."""
     for directory in request.directories:
         yield from content_source(
             root=directory.root,
             url_prefix=directory.url_prefix,
-            matchers=matchers,
+            filter_spec=request.filter_spec,
             default_priority=request.default_priority,
         )
     yield from request.explicit_entries
@@ -113,7 +111,6 @@ def _iter_entries(
 def _stream_documents(
     request: GenerateRequest,
     content_source: ContentSource,
-    matchers: tuple[Matcher, ...],
     stats: _StreamStats,
 ) -> Iterator[SitemapDocument]:
     """Yield sitemap documents lazily, each holding at most ``MAX_URLS`` entries.
@@ -123,7 +120,7 @@ def _stream_documents(
     entries), so the writer always produces an output file.
     """
     buffer: list[SitemapEntry] = []
-    for entry in _iter_entries(request, content_source, matchers):
+    for entry in _iter_entries(request, content_source):
         buffer.append(entry)
         stats.urls += 1
         if len(buffer) >= MAX_URLS:
@@ -155,9 +152,8 @@ def generate_sitemap(
     Returns:
         A :class:`GenerateResult` describing the run.
     """
-    matchers = compile_filters(request.drop_patterns)
     stats = _StreamStats()
-    documents = _stream_documents(request, content_source, matchers, stats)
+    documents = _stream_documents(request, content_source, stats)
 
     if request.dry_run:
         for _document in documents:  # consume to count; nothing is written
