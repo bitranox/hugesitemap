@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-06-27
+
+### Documentation
+- Update the remaining living docs that still described the old filter engine to
+  the gitignore mechanism (the `ai-disclosure.md` architecture summary and the
+  `load_sites` docstring). The dated `docs/plans/` design record and the historical
+  1.0.0 changelog entry are left as point-in-time records.
+
 ## [2.0.0] - 2026-06-27
 
 Filters now use git `.gitignore` semantics (via `igittigitt`).

@@ -28,8 +28,8 @@ git log.
   `[[site]]` array (no per-run config file, no profiles), with an optional global
   `[sitemap]` section whose scalars override per site and whose filter list
   extends each site's own. Third, reproduce the old live output exactly: directory
-  and file URLs, real mtime `lastmod`, fixed-precision priority, ordered
-  wildcard/regexp drop filters, a sitemap index above 50,000 URLs, and validated,
+  and file URLs, real mtime `lastmod`, fixed-precision priority, path filters
+  (git `.gitignore` semantics since 2.0.0), a sitemap index above 50,000 URLs, and validated,
   atomically-replaced output. Use libdeflate (via the `deflate` package) for gzip
   (best ratio for a write-once, serve-many file) and lxml with re-parse
   validation.
@@ -48,7 +48,7 @@ git log.
 ## Where AI helped
 
 Under that direction, the assistant did the legwork: drafting the domain (the
-sitemap value objects, the ordered wildcard/regexp filter engine, the formatting
+sitemap value objects, the gitignore-style path filter, the formatting
 and limit helpers), the `GenerateSitemap` use case and its streaming chunker, the
 filesystem walker, the lxml writer (tree build, re-parse validation, atomic write,
 gzip, sitemap-index split), the typed facades over lxml and libdeflate, and the

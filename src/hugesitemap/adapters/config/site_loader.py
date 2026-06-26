@@ -186,7 +186,7 @@ def load_sites(config: Config) -> list[SiteConfig]:
 
     Global defaults from the ``[sitemap]`` section are applied to each site:
     ``gzip``/``default_priority`` are inherited unless the site overrides them,
-    and the global drop filters are prepended to each site's own filters (see
+    and the global ignore filters are prepended to each site's own filters (see
     :class:`SitemapDefaults`).
 
     Returns:

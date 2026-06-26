@@ -1,6 +1,6 @@
 [project]
 name = "hugesitemap"
-version = "2.0.0"
+version = "2.0.1"
 description = "Generate sitemap.xml (sitemaps.org 0.9) by scanning a site's content directories"
 readme = "README.md"
 requires-python = ">=3.10"
