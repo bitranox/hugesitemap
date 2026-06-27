@@ -6,6 +6,12 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Documentation
+- Add `docs/filtering-examples.md`: one tree run through every filter option
+  (inline `keep`/`ignore`, `.sitemapignore`, `.sitemapinclude`, and the combined
+  include+ignore case) with the exact sitemap each config produces. Linked from
+  README and CONFIG.
+
 ## [2.1.0] - 2026-06-27
 
 ### Added

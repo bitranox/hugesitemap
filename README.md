@@ -337,8 +337,10 @@ by default instead of silently appearing.
 **Precedence.** A path is indexed iff the include side keeps it **and** the ignore
 side does not drop it - so **ignore wins** across the two. Within each side the
 sources apply inline -> file -> nested with **later winning** (git last-match-wins;
-a deeper nested file beats a shallower one). Full details and a worked nested-file
-example are in [CONFIG.md](CONFIG.md#filters-gitignore-semantics).
+a deeper nested file beats a shallower one). The field reference is in
+[CONFIG.md](CONFIG.md#filters-gitignore-semantics); a single tree run through every
+option (with the exact sitemap each produces) is in
+[docs/filtering-examples.md](docs/filtering-examples.md).
 
 > **Keep all sites in one layer.** `lib_layered_config` deep-merges nested
 > tables but replaces lists wholesale (last writer wins), so a higher layer
@@ -386,6 +388,7 @@ for site in load_sites(get_config()):
 - [Development Handbook](DEVELOPMENT.md)
 - [Contributor Guide](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
+- [Filtering examples](docs/filtering-examples.md)
 - [Module Reference](docs/systemdesign/module_reference.md)
 - [License](LICENSE)
 

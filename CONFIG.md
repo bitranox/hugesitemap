@@ -457,7 +457,9 @@ different merge rules:
 ### Filters (gitignore semantics)
 
 Filtering uses git `.gitignore` matching via
-[`igittigitt`](https://github.com/bitranox/igittigitt). A filter has two symmetric
+[`igittigitt`](https://github.com/bitranox/igittigitt). A single tree run through
+every option below, with the exact sitemap each config produces, is in
+[docs/filtering-examples.md](docs/filtering-examples.md). A filter has two symmetric
 sides, each with the same three sources:
 
 | Source              | Include / allowlist side | Ignore / deny side       |
