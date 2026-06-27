@@ -86,6 +86,22 @@ def test_generate_writes_expected_urls(
 
 
 @pytest.mark.os_agnostic
+def test_generate_keep_mode_indexes_only_allowlisted_files(
+    tmp_path: Path,
+    cli_runner: CliRunner,
+    factory_with_sites: Callable[[list[dict[str, Any]]], Callable[[], AppServices]],
+) -> None:
+    site = _site_dict(tmp_path, "media")
+    site["filters"] = {"keep": ["*.pdf"]}  # allowlist: index only PDFs
+    factory = factory_with_sites([site])
+    result = cli_runner.invoke(cli_mod.cli, ["generate"], obj=factory)
+    assert result.exit_code == 0, result.output
+    body = _out(tmp_path, "media").read_text(encoding="utf-8")
+    assert "https://media.test/a000/doc.pdf" in body  # kept
+    assert "notes.txt" not in body  # not in the allowlist
+
+
+@pytest.mark.os_agnostic
 def test_generate_selects_named_sites(
     tmp_path: Path,
     cli_runner: CliRunner,

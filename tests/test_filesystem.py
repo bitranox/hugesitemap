@@ -55,6 +55,26 @@ def test_filters_drop_files_and_prune_dirs(tmp_path: Path) -> None:
     assert f"{PREFIX}000/doc.pdf" in locs
 
 
+def test_keep_mode_emits_only_matching_files(tmp_path: Path) -> None:
+    _build_tree(tmp_path)
+    # _build_tree creates 000/doc.pdf, 000/notes.txt, 000/.hidden, zsvc/.../skip.pdf, top.pdf
+    spec = FilterSpec(keep_patterns=("*.pdf",))
+    locs = _locs(tmp_path, spec)
+    assert f"{PREFIX}top.pdf" in locs
+    assert f"{PREFIX}000/doc.pdf" in locs
+    assert f"{PREFIX}000/notes.txt" not in locs  # not in the allowlist
+    assert not any(loc.endswith(".hidden") for loc in locs)
+
+
+def test_keep_then_ignore_subtracts(tmp_path: Path) -> None:
+    _build_tree(tmp_path)
+    # Allowlist PDFs, then drop the zsvc subtree even though it holds a pdf.
+    spec = FilterSpec(keep_patterns=("*.pdf",), patterns=("zsvc/",))
+    locs = _locs(tmp_path, spec)
+    assert f"{PREFIX}top.pdf" in locs
+    assert not any("zsvc" in loc for loc in locs)
+
+
 def test_negation_keeps_only_one_kind(tmp_path: Path) -> None:
     _build_tree(tmp_path)
     # Ignore everything, keep directories to descend, re-include only PDFs.

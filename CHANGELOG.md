@@ -6,6 +6,30 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-06-27
+
+### Added
+- Allowlist (include) filtering, symmetric to the ignore side. Each
+  `[site.filters]` (and the global `[sitemap.filters]`) now has an include side -
+  `keep` (inline), `keep_file`, and `nested_keep_filename` (per-directory files,
+  e.g. `.sitemapinclude`) - mirroring `ignore` / `ignore_file` /
+  `nested_ignore_filename`. When any include source is set, only paths it keeps are
+  indexed and the ignore side then subtracts. Backed by `igittigitt.IncludeParser`,
+  so it is directory-aware (keeps the parent directories of a deep match) - the
+  recommended way to "index only X", safer than the `!`-inversion for large or
+  fast-changing trees. Surfaced on the domain `FilterSpec` as `keep_patterns` /
+  `keep_file` / `nested_keep_filename`.
+
+  Precedence: a path is indexed iff the include side keeps it AND the ignore side
+  does not drop it (ignore wins across the two); within each side the sources apply
+  inline -> file -> nested with later winning, and a deeper nested file beats a
+  shallower one. The include side extends globally like the ignore side; a global
+  `keep` switches every site into allowlist mode.
+
+  The domain field `nested_filename` was renamed to `nested_ignore_filename` for
+  symmetry with the new `nested_keep_filename` (internal API; the TOML config key
+  was already `nested_ignore_filename`).
+
 ### Changed
 - `walk_directory` now skips building the igittigitt parser and the per-path
   `is_ignored` stat when a site configures no filters (`FilterSpec.is_empty`),

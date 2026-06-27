@@ -135,9 +135,9 @@ git `.gitignore` semantics and is performed by `igittigitt` in the adapter layer
 (`adapters/gitignore_filter.py`), so the domain stays free of I/O and third-party
 imports.
 
-| Symbol       | Description                                                                                   |
-|--------------|-----------------------------------------------------------------------------------------------|
-| `FilterSpec` | Immutable rule description: `patterns`, `ignore_file`, `nested_filename`; `is_empty` property |
+| Symbol       | Description                                                                                                                                                                                |
+|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `FilterSpec` | Immutable rule description: include side (`keep_patterns`, `keep_file`, `nested_keep_filename`) and ignore side (`patterns`, `ignore_file`, `nested_ignore_filename`); `is_empty` property |
 
 ### formatting.py - Pure serialization helpers
 

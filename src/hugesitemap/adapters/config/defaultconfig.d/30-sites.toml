@@ -41,9 +41,15 @@
 #     changefreq = "yearly"
 #     priority   = 0.1
 #
-#     [site.filters]                             # gitignore-style exclusion rules
-#     ignore = ["*~", ".*", "*.txt"]             # inline .gitignore patterns
-#     # ignore_file = "/srv/www/media/.sitemapignore"   # optional rules file
+#     [site.filters]                             # gitignore-style selection rules
+#     # Two symmetric sides; ignore wins across them, later source wins within a side.
+#     # Include / allowlist side (index ONLY these); set any to switch to allowlist mode:
+#     # keep = ["*.html"]
+#     # keep_file = "/srv/www/media/.allow.sitemapinclude"
+#     # nested_keep_filename = ".sitemapinclude"
+#     # Ignore / deny side (subtracts from whatever the include side allowed):
+#     ignore = ["*~", ".*", "*.txt"]             # inline .gitignore ignore patterns
+#     # ignore_file = "/srv/www/media/.sitemapignore"
 #     # nested_ignore_filename = ".sitemapignore"       # discover per-directory files
 #
 # A full two-site example lives in the repository's examples/sites.toml.

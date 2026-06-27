@@ -49,6 +49,10 @@ output_path = "/srv/www/docs/sitemap.xml"
   # Appended after the global patterns above; only the docs-specific extra here.
   # Trailing slash makes "drafts/" prune the directory and its whole subtree.
   ignore = ["drafts/"]
+  # Allowlist alternative (uncomment to index ONLY HTML; ignore then subtracts):
+  #   keep = ["*.html"]
+  # "keep" is the safe choice for big/fast-changing trees - a new directory is
+  # excluded by default instead of silently appearing in the sitemap.
 
 [[site]]
 name        = "files"

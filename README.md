@@ -29,7 +29,8 @@ the low hundreds of MB on any server; only the output file on disk grows. See
 - `<lastmod>` from each entry's real mtime in ISO8601 UTC (`...Z`), 4-decimal
   `<priority>`, and explicit `[[url]]` entries with their own changefreq/priority.
 - Git `.gitignore`-style filters (via `igittigitt`): anchored patterns, subtree
-  pruning, `!` allowlists, optional per-directory `.sitemapignore` files.
+  pruning, a `keep` allowlist (index only X), rule files, and optional
+  per-directory `.sitemapignore` / `.sitemapinclude` files.
 - 50,000-URL split into a sitemap index plus numbered child sitemaps.
 - Optional gzip output (libdeflate at maximum ratio - smallest standard-gzip
   `.gz` for a write-once, serve-many file); atomic write with lxml re-parse
@@ -298,32 +299,46 @@ each site's own, so common patterns are written once and each site lists only it
 extras. Because matching is last-match-wins, a site can re-include a globally
 ignored path with a `!` negation.
 
-| Key                                     | Type        | Default  | Description                                                        |
-|-----------------------------------------|-------------|----------|--------------------------------------------------------------------|
-| `[sitemap]`                             | table       | absent   | Global defaults shared by all sites (optional).                    |
-| `[sitemap].gzip`                        | bool        | `false`  | Default `gzip`; a site's own value overrides it.                   |
-| `[sitemap].default_priority`            | float       | `0.5`    | Default priority; a site's own value overrides it.                 |
-| `[sitemap.filters].ignore`              | array       | `[]`     | `.gitignore` patterns prepended to every site's own.               |
-| `[[site]]`                              | table array | `[]`     | One entry per site; `generate` processes all by default.           |
-| `name`                                  | string      | required | Unique site identifier used by `--site`.                           |
-| `base_url`                              | string      | required | Site base URL; used to build child sitemap URLs on split.          |
-| `output_path`                           | string      | required | Destination path for `sitemap.xml`.                                |
-| `gzip`                                  | bool        | inherits | Write gzip-compressed output (`sitemap.xml.gz`).                   |
-| `default_priority`                      | float       | inherits | Priority assigned to every walked entry.                           |
-| `[[site.directory]]`                    | table array | `[]`     | `path` (on disk) mapped to `url` (prefix).                         |
-| `[[site.url]]`                          | table array | `[]`     | Explicit `loc` with optional `changefreq`/`priority`.              |
-| `[site.filters].ignore`                 | array       | `[]`     | Site `.gitignore` patterns; appended after the global ones.        |
-| `[site.filters].ignore_file`            | string      | absent   | Path to a `.gitignore`-format rule file for this site.             |
-| `[site.filters].nested_ignore_filename` | string      | absent   | Per-directory ignore filename to discover (e.g. `.sitemapignore`). |
+| Key                                     | Type        | Default  | Description                                                                  |
+|-----------------------------------------|-------------|----------|------------------------------------------------------------------------------|
+| `[sitemap]`                             | table       | absent   | Global defaults shared by all sites (optional).                              |
+| `[sitemap].gzip`                        | bool        | `false`  | Default `gzip`; a site's own value overrides it.                             |
+| `[sitemap].default_priority`            | float       | `0.5`    | Default priority; a site's own value overrides it.                           |
+| `[sitemap.filters].ignore`              | array       | `[]`     | `.gitignore` patterns prepended to every site's own.                         |
+| `[[site]]`                              | table array | `[]`     | One entry per site; `generate` processes all by default.                     |
+| `name`                                  | string      | required | Unique site identifier used by `--site`.                                     |
+| `base_url`                              | string      | required | Site base URL; used to build child sitemap URLs on split.                    |
+| `output_path`                           | string      | required | Destination path for `sitemap.xml`.                                          |
+| `gzip`                                  | bool        | inherits | Write gzip-compressed output (`sitemap.xml.gz`).                             |
+| `default_priority`                      | float       | inherits | Priority assigned to every walked entry.                                     |
+| `[[site.directory]]`                    | table array | `[]`     | `path` (on disk) mapped to `url` (prefix).                                   |
+| `[[site.url]]`                          | table array | `[]`     | Explicit `loc` with optional `changefreq`/`priority`.                        |
+| `[site.filters].keep`                   | array       | `[]`     | Allowlist patterns: index **only** matching files (`ignore` then subtracts). |
+| `[site.filters].ignore`                 | array       | `[]`     | Ignore patterns; appended after the global ones.                             |
+| `[site.filters].keep_file`              | string      | absent   | Path to an allowlist rule file (the include-side `ignore_file`).             |
+| `[site.filters].ignore_file`            | string      | absent   | Path to a `.gitignore`-format ignore rule file for this site.                |
+| `[site.filters].nested_keep_filename`   | string      | absent   | Per-directory allowlist filename to discover (e.g. `.sitemapinclude`).       |
+| `[site.filters].nested_ignore_filename` | string      | absent   | Per-directory ignore filename to discover (e.g. `.sitemapignore`).           |
 
 Filtering uses git `.gitignore` semantics (via
 [`igittigitt`](https://github.com/bitranox/igittigitt)): patterns are anchored at
-each directory root, a trailing-slash pattern (`zsvc/`) prunes a whole subtree, and
-`!pattern` re-includes. Ignored directories are pruned, so their entire subtree is
-skipped. To index **only** one kind of file, invert with an allowlist:
-`ignore = ["*", "!*/", "!*.html"]` keeps just `.html` (the `!*/` keeps directories
-so the walk can descend). Like git, a file under an ignored directory cannot be
-re-included.
+each directory root and a trailing-slash pattern (`zsvc/`) prunes a whole subtree.
+A filter has two **symmetric sides**, each with inline patterns, a rule file, and
+a per-directory nested filename: an **include** side (`keep` / `keep_file` /
+`nested_keep_filename`) and an **ignore** side (`ignore` / `ignore_file` /
+`nested_ignore_filename`).
+
+**Allowlist (`keep`).** To index **only** certain files, set `keep`: `keep =
+["*.html"]` indexes only HTML, `keep = ["a000/**"]` only that subtree. It is
+directory-aware (keeps the parent dirs of a match so the walk reaches deep files)
+and the safe choice for large or fast-changing trees - a new directory is excluded
+by default instead of silently appearing.
+
+**Precedence.** A path is indexed iff the include side keeps it **and** the ignore
+side does not drop it - so **ignore wins** across the two. Within each side the
+sources apply inline -> file -> nested with **later winning** (git last-match-wins;
+a deeper nested file beats a shallower one). Full details and a worked nested-file
+example are in [CONFIG.md](CONFIG.md#filters-gitignore-semantics).
 
 > **Keep all sites in one layer.** `lib_layered_config` deep-merges nested
 > tables but replaces lists wholesale (last writer wins), so a higher layer

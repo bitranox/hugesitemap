@@ -85,14 +85,14 @@ def test_filter_spec_defaults_are_empty() -> None:
     spec = FilterSpec()
     assert spec.patterns == ()
     assert spec.ignore_file is None
-    assert spec.nested_filename is None
+    assert spec.nested_ignore_filename is None
     assert spec.is_empty
 
 
 def test_filter_spec_with_any_source_is_not_empty() -> None:
     assert not FilterSpec(patterns=("*~",)).is_empty
     assert not FilterSpec(ignore_file="/etc/rules").is_empty
-    assert not FilterSpec(nested_filename=".sitemapignore").is_empty
+    assert not FilterSpec(nested_ignore_filename=".sitemapignore").is_empty
 
 
 def test_filter_spec_is_frozen_and_hashable() -> None:

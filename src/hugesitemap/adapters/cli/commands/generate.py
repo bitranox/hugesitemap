@@ -50,9 +50,12 @@ def _build_request(site: SiteConfig, *, gzip: bool, dry_run: bool) -> GenerateRe
         SitemapEntry(loc=u.loc, lastmod=None, priority=u.priority, changefreq=u.changefreq) for u in site.explicit_urls
     )
     filter_spec = FilterSpec(
+        keep_patterns=tuple(site.filters.keep),
         patterns=tuple(site.filters.ignore),
+        keep_file=site.filters.keep_file,
         ignore_file=site.filters.ignore_file,
-        nested_filename=site.filters.nested_ignore_filename,
+        nested_keep_filename=site.filters.nested_keep_filename,
+        nested_ignore_filename=site.filters.nested_ignore_filename,
     )
     return GenerateRequest(
         base_url=site.base_url,

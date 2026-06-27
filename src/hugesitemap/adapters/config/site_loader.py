@@ -49,17 +49,30 @@ class FilterConfig(BaseModel):
 
     Filtering uses git ``.gitignore`` semantics (via ``igittigitt``).
 
+    The include side (``keep*``) and ignore side are symmetric: each has inline
+    patterns, a rule file, and a per-directory nested filename.
+
     Attributes:
-        ignore: Inline ``.gitignore`` patterns, anchored at each directory root.
-        ignore_file: Optional path to a ``.gitignore``-format rule file.
+        keep: Inline allowlist patterns. When any ``keep*`` field is set the site
+            runs in include mode: only matching paths are indexed, and the ignore
+            rules then subtract. Empty (default) means deny mode - every path is
+            indexed unless an ignore rule drops it.
+        ignore: Inline ``.gitignore`` ignore patterns, anchored at each root.
+        keep_file: Optional path to an allowlist rule file.
+        ignore_file: Optional path to a ``.gitignore``-format ignore rule file.
+        nested_keep_filename: Optional per-directory allowlist filename discovered
+            throughout each scanned tree (for example ``.sitemapinclude``).
         nested_ignore_filename: Optional per-directory ignore filename discovered
             throughout each scanned tree (for example ``.sitemapignore``).
     """
 
     model_config = ConfigDict(extra="forbid")
 
+    keep: list[str] = Field(default_factory=list)
     ignore: list[str] = Field(default_factory=list)
+    keep_file: str | None = None
     ignore_file: str | None = None
+    nested_keep_filename: str | None = None
     nested_ignore_filename: str | None = None
 
 
@@ -112,6 +125,11 @@ class SitemapDefaults(BaseModel):
     globally-ignored path with a ``!`` negation. ``ignore_file`` and
     ``nested_ignore_filename`` fall back to the global value when the site omits
     them.
+
+    The global ``keep`` allowlist extends the same way (global ``keep`` prepended
+    to each site's own). Note that setting a global ``keep`` switches **every**
+    site into allowlist mode (only matching paths are indexed), so use it only as
+    a deliberate site-wide policy.
 
     Rationale for extend over replace: sites share a common base of junk patterns
     (``*~``, hidden dotfiles, ``*.txt`` ...) and each adds only a few extras.
@@ -169,8 +187,11 @@ def _extend_filters(site: SiteConfig, defaults: SitemapDefaults) -> SiteConfig:
     """
     glob = defaults.filters
     merged = FilterConfig(
+        keep=[*glob.keep, *site.filters.keep],
         ignore=[*glob.ignore, *site.filters.ignore],
+        keep_file=site.filters.keep_file or glob.keep_file,
         ignore_file=site.filters.ignore_file or glob.ignore_file,
+        nested_keep_filename=site.filters.nested_keep_filename or glob.nested_keep_filename,
         nested_ignore_filename=site.filters.nested_ignore_filename or glob.nested_ignore_filename,
     )
     if merged == site.filters:
