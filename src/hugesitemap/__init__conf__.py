@@ -40,7 +40,7 @@ name = "hugesitemap"
 #: Human-readable summary shown in CLI help output.
 title = "Generate sitemap.xml (sitemaps.org 0.9) by scanning a site's content directories"
 #: Current release version pulled from ``pyproject.toml`` by automation.
-version = "2.1.0"
+version = "2.2.0"
 #: Repository homepage presented to users.
 homepage = "https://github.com/bitranox/hugesitemap"
 #: Author attribution surfaced in CLI output.

@@ -65,6 +65,7 @@ def _build_request(site: SiteConfig, *, gzip: bool, dry_run: bool) -> GenerateRe
         directories=directories,
         explicit_entries=explicit,
         filter_spec=filter_spec,
+        directory_urls=site.directory_urls,
         dry_run=dry_run,
     )
 

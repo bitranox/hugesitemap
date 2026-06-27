@@ -417,6 +417,7 @@ output_path = "/srv/www/www/sitemap.xml"
 | `[sitemap]`                             | table       | absent   | Global defaults shared by all sites (optional).                                         |
 | `[sitemap].gzip`                        | bool        | `false`  | Default `gzip`; a site's own value overrides it.                                        |
 | `[sitemap].default_priority`            | float       | `0.5`    | Default priority; a site's own value overrides it.                                      |
+| `[sitemap].directory_urls`              | bool        | `true`   | Default for `directory_urls`; a site's own value overrides it.                          |
 | `[sitemap.filters].ignore`              | array       | `[]`     | `.gitignore` patterns prepended to every site's own.                                    |
 | `[[site]]`                              | table array | `[]`     | One entry per site; `generate` processes all by default.                                |
 | `name`                                  | string      | required | Unique site identifier used by `--site`.                                                |
@@ -424,6 +425,7 @@ output_path = "/srv/www/www/sitemap.xml"
 | `output_path`                           | string      | required | Destination path for the generated `sitemap.xml`.                                       |
 | `gzip`                                  | bool        | inherits | Write gzip-compressed output (`sitemap.xml.gz`).                                        |
 | `default_priority`                      | float       | inherits | Priority assigned to every walked entry.                                                |
+| `directory_urls`                        | bool        | `true`   | Emit directory listing URLs; set `false` for a files-only sitemap.                      |
 | `[[site.directory]]`                    | table array | `[]`     | Repeatable: on-disk `path` mapped to `url` (prefix).                                    |
 | `[[site.url]]`                          | table array | `[]`     | Repeatable: explicit `loc` with optional `changefreq` and `priority` (default `0.5`).   |
 | `[site.filters].keep`                   | array       | `[]`     | Allowlist patterns: index **only** matching files (the `ignore` side then subtracts).   |
@@ -519,6 +521,27 @@ Worked example, with `nested_ignore_filename = ".sitemapignore"`:
       report.tmp       # indexed again here, because the deeper rule re-includes it
   aalg/
     keep.pdf           # indexed (no local rules apply)
+```
+
+### Directory URLs (`directory_urls`)
+
+By default the sitemap lists a **directory URL** (trailing `/`) for every directory
+the walk visits, plus a **file URL** per surviving file. Set `directory_urls = false`
+(per site, or globally under `[sitemap]`) to emit **only file URLs**. The tree is
+still walked and filtered exactly the same way - only the directory listing URLs are
+left out.
+
+Use it when the directory listings are low-value autoindex pages you do not want a
+search engine to crawl or index, so the sitemap carries just the real content (e.g.
+the files, or with `keep` the files of one type). Explicit `[[site.url]]` entries are
+never affected. If a few directory pages *are* worth indexing (real category/landing
+pages), keep `directory_urls = false` and add those pages back as `[[site.url]]`
+entries.
+
+```toml
+[[site]]
+# ...
+directory_urls = false        # files-only sitemap
 ```
 
 ### Selecting Sites

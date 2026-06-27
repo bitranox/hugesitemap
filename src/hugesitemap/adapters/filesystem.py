@@ -41,6 +41,7 @@ def walk_directory(
     url_prefix: str,
     filter_spec: FilterSpec,
     default_priority: float,
+    directory_urls: bool = True,
 ) -> Iterator[SitemapEntry]:
     """Yield directory and file entries for one configured directory.
 
@@ -49,6 +50,8 @@ def walk_directory(
         url_prefix: URL prefix that ``root`` maps to.
         filter_spec: Gitignore-style exclusion rules anchored at ``root``.
         default_priority: Priority assigned to every emitted entry.
+        directory_urls: When ``False``, emit only file URLs (the tree is still
+            walked and pruned, but directory listing URLs are not yielded).
 
     Yields:
         :class:`SitemapEntry` objects for surviving directories and files,
@@ -73,7 +76,8 @@ def walk_directory(
         if path_filter is not None:
             dirnames[:] = [name for name in dirnames if not path_filter.is_ignored(str(dirpath / name))]
 
-        yield _entry_for(dirpath, _dir_loc(url_prefix, rel_posix), default_priority)
+        if directory_urls:
+            yield _entry_for(dirpath, _dir_loc(url_prefix, rel_posix), default_priority)
 
         for name in filenames:
             full = dirpath / name

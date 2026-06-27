@@ -57,6 +57,7 @@ class GenerateRequest:
         directories: Configured directories to walk.
         explicit_entries: Extra entries from ``[[url]]`` config blocks.
         filter_spec: Path-exclusion rules (gitignore semantics).
+        directory_urls: When false, emit only file URLs (no directory listings).
         dry_run: When true, walk and count but do not write.
     """
 
@@ -67,6 +68,7 @@ class GenerateRequest:
     directories: tuple[DirectoryRequest, ...]
     explicit_entries: tuple[SitemapEntry, ...] = ()
     filter_spec: FilterSpec = field(default_factory=FilterSpec)
+    directory_urls: bool = True
     dry_run: bool = False
 
 
@@ -104,6 +106,7 @@ def _iter_entries(
             url_prefix=directory.url_prefix,
             filter_spec=request.filter_spec,
             default_priority=request.default_priority,
+            directory_urls=request.directory_urls,
         )
     yield from request.explicit_entries
 

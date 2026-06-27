@@ -248,6 +248,38 @@ out exceptions.
 
 ---
 
+## Bonus: files-only output (`directory_urls = false`)
+
+`directory_urls` is not a filter - it is a per-site switch on what kinds of URL get
+emitted. By default the sitemap lists a directory URL (trailing `/`) for every walked
+directory plus a file URL per surviving file. Setting `directory_urls = false` keeps
+the same walking and filtering but emits **only file URLs** - useful when the
+directory listings are low-value autoindex pages you do not want indexed.
+
+```toml
+[[site]]
+# ...
+directory_urls = false
+  [site.filters]
+  # no filters here, same tree as scenario 1
+```
+
+```
+cache/tmp.pdf
+data/report.pdf
+data/report.tmp
+guide/archive/old.pdf
+guide/intro.html
+guide/intro.pdf
+index.html
+notes.txt
+```
+
+Compare to scenario 1: the 5 directory URLs are gone, the 8 file URLs remain. It
+composes with the filters above - e.g. `directory_urls = false` together with
+`keep = ["*.pdf"]` yields a pure list of PDF file URLs. Explicit `[[site.url]]`
+entries are never affected by this switch.
+
 ## Precedence, restated
 
 1. **Include phase.** If any `keep*` source is set, a path must be kept by it to be

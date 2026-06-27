@@ -134,6 +134,19 @@ def test_global_keep_extends_site_keep() -> None:
     assert sites[0].filters.keep == ["*.pdf", "*.html"]
 
 
+def test_directory_urls_defaults_true_and_loads() -> None:
+    assert load_sites(_config(WWW))[0].directory_urls is True
+    site = {**WWW, "directory_urls": False}
+    assert load_sites(_config(site))[0].directory_urls is False
+
+
+def test_directory_urls_inherits_global_then_site_overrides() -> None:
+    sites = load_sites(_config_with({"directory_urls": False}, WWW))
+    assert sites[0].directory_urls is False  # inherited
+    sites = load_sites(_config_with({"directory_urls": False}, {**WWW, "directory_urls": True}))
+    assert sites[0].directory_urls is True  # site wins
+
+
 def test_keep_side_files_load_and_inherit() -> None:
     defaults = {"filters": {"keep_file": "/etc/keep.inc", "nested_keep_filename": ".sitemapinclude"}}
     sites = load_sites(_config_with(defaults, WWW))

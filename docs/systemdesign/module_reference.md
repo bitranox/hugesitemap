@@ -184,12 +184,12 @@ Infrastructure types (`Config`, `SiteConfig`) are imported under `TYPE_CHECKING`
 Pure orchestration over the `ContentSource` and `SitemapWriter` ports. Imports only
 domain types and stdlib; never touches the filesystem or lxml directly.
 
-| Symbol                                                     | Description                                                                                                                                 |
-|------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| `DirectoryRequest`                                         | One on-disk root (`root`) mapped to a URL prefix (`url_prefix`)                                                                             |
-| `GenerateRequest`                                          | Full input for one site: `base_url`, `output_path`, `gzip`, `default_priority`, `directories`, `explicit_entries`, `filter_spec`, `dry_run` |
-| `GenerateResult`                                           | Outcome: `url_count`, `paths_written`, `was_split`                                                                                          |
-| `generate_sitemap(request, content_source, write_sitemap)` | Walk directories, append explicit entries, split into protocol-compliant documents, and write (unless dry-run)                              |
+| Symbol                                                     | Description                                                                                                                                                   |
+|------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `DirectoryRequest`                                         | One on-disk root (`root`) mapped to a URL prefix (`url_prefix`)                                                                                               |
+| `GenerateRequest`                                          | Full input for one site: `base_url`, `output_path`, `gzip`, `default_priority`, `directories`, `explicit_entries`, `filter_spec`, `directory_urls`, `dry_run` |
+| `GenerateResult`                                           | Outcome: `url_count`, `paths_written`, `was_split`                                                                                                            |
+| `generate_sitemap(request, content_source, write_sitemap)` | Walk directories, append explicit entries, split into protocol-compliant documents, and write (unless dry-run)                                                |
 
 ---
 

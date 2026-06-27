@@ -86,6 +86,23 @@ def test_generate_writes_expected_urls(
 
 
 @pytest.mark.os_agnostic
+def test_generate_directory_urls_false_writes_files_only(
+    tmp_path: Path,
+    cli_runner: CliRunner,
+    factory_with_sites: Callable[[list[dict[str, Any]]], Callable[[], AppServices]],
+) -> None:
+    site = _site_dict(tmp_path, "media")
+    site["directory_urls"] = False
+    factory = factory_with_sites([site])
+    result = cli_runner.invoke(cli_mod.cli, ["generate"], obj=factory)
+    assert result.exit_code == 0, result.output
+    body = _out(tmp_path, "media").read_text(encoding="utf-8")
+    assert "https://media.test/a000/doc.pdf" in body  # file URLs kept
+    assert "<loc>https://media.test/a000/</loc>" not in body  # directory URL suppressed
+    assert "https://media.test/index.html" in body  # explicit [[url]] entries unaffected
+
+
+@pytest.mark.os_agnostic
 def test_generate_keep_mode_indexes_only_allowlisted_files(
     tmp_path: Path,
     cli_runner: CliRunner,

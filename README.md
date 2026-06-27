@@ -304,6 +304,7 @@ ignored path with a `!` negation.
 | `[sitemap]`                             | table       | absent   | Global defaults shared by all sites (optional).                              |
 | `[sitemap].gzip`                        | bool        | `false`  | Default `gzip`; a site's own value overrides it.                             |
 | `[sitemap].default_priority`            | float       | `0.5`    | Default priority; a site's own value overrides it.                           |
+| `[sitemap].directory_urls`              | bool        | `true`   | Default for `directory_urls`; a site's own value overrides it.               |
 | `[sitemap.filters].ignore`              | array       | `[]`     | `.gitignore` patterns prepended to every site's own.                         |
 | `[[site]]`                              | table array | `[]`     | One entry per site; `generate` processes all by default.                     |
 | `name`                                  | string      | required | Unique site identifier used by `--site`.                                     |
@@ -311,6 +312,7 @@ ignored path with a `!` negation.
 | `output_path`                           | string      | required | Destination path for `sitemap.xml`.                                          |
 | `gzip`                                  | bool        | inherits | Write gzip-compressed output (`sitemap.xml.gz`).                             |
 | `default_priority`                      | float       | inherits | Priority assigned to every walked entry.                                     |
+| `directory_urls`                        | bool        | `true`   | Emit directory listing URLs; set `false` for a files-only sitemap.           |
 | `[[site.directory]]`                    | table array | `[]`     | `path` (on disk) mapped to `url` (prefix).                                   |
 | `[[site.url]]`                          | table array | `[]`     | Explicit `loc` with optional `changefreq`/`priority`.                        |
 | `[site.filters].keep`                   | array       | `[]`     | Allowlist patterns: index **only** matching files (`ignore` then subtracts). |

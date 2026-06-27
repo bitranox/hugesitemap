@@ -78,9 +78,10 @@ class LoadSites(Protocol):
 class ContentSource(Protocol):
     """Walk one configured directory and yield sitemap entries.
 
-    Emits both directory URLs (trailing slash) and file URLs, mapping each
-    on-disk relative path under ``root`` to a URL under ``url_prefix`` and
-    excluding any path matched by ``filter_spec`` (gitignore semantics).
+    Emits file URLs (and, when ``directory_urls`` is true, directory URLs with a
+    trailing slash), mapping each on-disk relative path under ``root`` to a URL
+    under ``url_prefix`` and excluding any path matched by ``filter_spec``
+    (gitignore semantics).
     """
 
     def __call__(
@@ -90,6 +91,7 @@ class ContentSource(Protocol):
         url_prefix: str,
         filter_spec: FilterSpec,
         default_priority: float,
+        directory_urls: bool = ...,
     ) -> Iterable[SitemapEntry]: ...
 
 

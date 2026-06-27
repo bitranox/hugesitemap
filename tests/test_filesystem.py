@@ -55,6 +55,26 @@ def test_filters_drop_files_and_prune_dirs(tmp_path: Path) -> None:
     assert f"{PREFIX}000/doc.pdf" in locs
 
 
+def test_directory_urls_false_emits_only_files(tmp_path: Path) -> None:
+    _build_tree(tmp_path)
+    entries = list(
+        walk_directory(
+            root=str(tmp_path), url_prefix=PREFIX, filter_spec=FilterSpec(), default_priority=0.5, directory_urls=False
+        )
+    )
+    locs = {e.loc for e in entries}
+    assert all(not loc.endswith("/") for loc in locs)  # no directory URLs at all
+    assert PREFIX not in locs  # not even the root directory URL
+    assert f"{PREFIX}top.pdf" in locs  # files are still emitted
+    assert f"{PREFIX}000/doc.pdf" in locs
+
+
+def test_directory_urls_true_is_the_default(tmp_path: Path) -> None:
+    _build_tree(tmp_path)
+    locs = _locs(tmp_path, FilterSpec())
+    assert PREFIX in locs  # root directory URL present by default
+
+
 def test_keep_mode_emits_only_matching_files(tmp_path: Path) -> None:
     _build_tree(tmp_path)
     # _build_tree creates 000/doc.pdf, 000/notes.txt, 000/.hidden, zsvc/.../skip.pdf, top.pdf

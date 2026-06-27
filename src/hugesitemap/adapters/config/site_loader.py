@@ -98,6 +98,8 @@ class SiteConfig(BaseModel):
         directories: ``[[site.directory]]`` blocks (TOML key ``directory``).
         explicit_urls: ``[[site.url]]`` blocks (TOML key ``url``).
         filters: The ``[site.filters]`` block.
+        directory_urls: Emit directory listing URLs (default ``true``); set
+            ``false`` for a files-only sitemap.
     """
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
@@ -107,6 +109,7 @@ class SiteConfig(BaseModel):
     output_path: str
     gzip: bool = False
     default_priority: float = 0.5
+    directory_urls: bool = True
     directories: list[DirectorySpec] = Field(default_factory=_no_directories, alias="directory")
     explicit_urls: list[ExplicitUrl] = Field(default_factory=_no_urls, alias="url")
     filters: FilterConfig = Field(default_factory=FilterConfig)
@@ -139,6 +142,7 @@ class SitemapDefaults(BaseModel):
     Attributes:
         gzip: Default gzip setting for sites that omit ``gzip``.
         default_priority: Default priority for sites that omit ``default_priority``.
+        directory_urls: Default for sites that omit ``directory_urls``.
         filters: Filters prepended to / inherited by every site's own filters.
     """
 
@@ -146,6 +150,7 @@ class SitemapDefaults(BaseModel):
 
     gzip: bool = False
     default_priority: float = 0.5
+    directory_urls: bool = True
     filters: FilterConfig = Field(default_factory=FilterConfig)
 
 
@@ -165,15 +170,17 @@ def _load_global_defaults(config: Config) -> SitemapDefaults:
 def _with_scalar_defaults(item: Any, defaults: SitemapDefaults) -> Any:
     """Fill a raw site mapping with the global scalar defaults it did not set.
 
-    Only ``gzip`` and ``default_priority`` are touched (override semantics);
-    filters are merged separately after validation. Non-mapping items are
-    returned unchanged so per-site schema validation rejects them clearly.
+    Only the scalars ``gzip``, ``default_priority``, and ``directory_urls`` are
+    touched (override semantics); filters are merged separately after validation.
+    Non-mapping items are returned unchanged so per-site schema validation rejects
+    them clearly.
     """
     if not isinstance(item, dict):
         return item
     merged: dict[str, Any] = dict(cast("dict[str, Any]", item))
     merged.setdefault("gzip", defaults.gzip)
     merged.setdefault("default_priority", defaults.default_priority)
+    merged.setdefault("directory_urls", defaults.directory_urls)
     return merged
 
 

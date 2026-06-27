@@ -6,11 +6,21 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-06-27
+
+### Added
+- `directory_urls` (per-site, and global `[sitemap].directory_urls`; default `true`):
+  set `false` for a **files-only** sitemap. The tree is still walked and filtered the
+  same way, but directory listing URLs are not emitted - useful when the directory
+  pages are low-value autoindex listings. Explicit `[[site.url]]` entries are
+  unaffected. Threaded as `GenerateRequest.directory_urls` and a `directory_urls`
+  argument on the `ContentSource` port / `walk_directory`.
+
 ### Documentation
 - Add `docs/filtering-examples.md`: one tree run through every filter option
-  (inline `keep`/`ignore`, `.sitemapignore`, `.sitemapinclude`, and the combined
-  include+ignore case) with the exact sitemap each config produces. Linked from
-  README and CONFIG.
+  (inline `keep`/`ignore`, `.sitemapignore`, `.sitemapinclude`, the combined
+  include+ignore case, and the `directory_urls = false` files-only output) with the
+  exact sitemap each config produces. Linked from README and CONFIG.
 
 ## [2.1.0] - 2026-06-27
 

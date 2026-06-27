@@ -37,6 +37,7 @@ class InMemoryContentSource:
         url_prefix: str,
         filter_spec: FilterSpec,
         default_priority: float,
+        directory_urls: bool = True,
     ) -> list[SitemapEntry]:
         """Return the entries registered for ``root`` (empty if none)."""
         return list(self.entries_by_root.get(root, []))
@@ -48,6 +49,7 @@ def content_source_empty(
     url_prefix: str,
     filter_spec: FilterSpec,
     default_priority: float,
+    directory_urls: bool = True,
 ) -> list[SitemapEntry]:
     """A content source that yields nothing (default for build_testing)."""
     return []
