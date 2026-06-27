@@ -103,6 +103,40 @@ def test_generate_directory_urls_false_writes_files_only(
 
 
 @pytest.mark.os_agnostic
+def test_generate_per_directory_directory_urls_override(
+    tmp_path: Path,
+    cli_runner: CliRunner,
+    factory_with_sites: Callable[[list[dict[str, Any]]], Callable[[], AppServices]],
+) -> None:
+    buckets = tmp_path / "buckets"
+    buckets.mkdir()
+    (buckets / "f1.pdf").write_bytes(b"x")
+    cats = tmp_path / "cats" / "pumps"
+    cats.mkdir(parents=True)
+    (cats / "f2.pdf").write_bytes(b"x")
+    out = tmp_path / "out" / "media.xml"
+    site = {
+        "name": "media",
+        "base_url": "https://media.test/",
+        "output_path": str(out),
+        "directory_urls": False,  # site default: files-only
+        "directory": [
+            {"path": str(buckets), "url": "https://media.test/buckets/"},  # inherits false
+            {"path": str(tmp_path / "cats"), "url": "https://media.test/cats/", "directory_urls": True},  # override
+        ],
+    }
+    factory = factory_with_sites([site])
+    result = cli_runner.invoke(cli_mod.cli, ["generate"], obj=factory)
+    assert result.exit_code == 0, result.output
+    body = out.read_text(encoding="utf-8")
+    assert "https://media.test/buckets/f1.pdf" in body  # files emitted everywhere
+    assert "https://media.test/cats/pumps/f2.pdf" in body
+    assert "<loc>https://media.test/buckets/</loc>" not in body  # bucket dir URL suppressed
+    assert "<loc>https://media.test/cats/</loc>" in body  # category dir URLs kept (override)
+    assert "<loc>https://media.test/cats/pumps/</loc>" in body
+
+
+@pytest.mark.os_agnostic
 def test_generate_keep_mode_indexes_only_allowlisted_files(
     tmp_path: Path,
     cli_runner: CliRunner,

@@ -45,7 +45,9 @@ ALL_SITES = "all"
 
 def _build_request(site: SiteConfig, *, gzip: bool, dry_run: bool) -> GenerateRequest:
     """Map a validated SiteConfig onto an application GenerateRequest."""
-    directories = tuple(DirectoryRequest(root=d.path, url_prefix=d.url) for d in site.directories)
+    directories = tuple(
+        DirectoryRequest(root=d.path, url_prefix=d.url, directory_urls=d.directory_urls) for d in site.directories
+    )
     explicit = tuple(
         SitemapEntry(loc=u.loc, lastmod=None, priority=u.priority, changefreq=u.changefreq) for u in site.explicit_urls
     )

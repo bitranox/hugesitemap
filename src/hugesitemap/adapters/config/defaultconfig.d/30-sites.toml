@@ -36,6 +36,7 @@
 #     [[site.directory]]                         # repeatable: disk path -> URL prefix
 #     path = "/srv/www/media/content"
 #     url  = "https://media.example.com/content/"
+#     # directory_urls = true                    # optional per-directory override of the site value
 #
 #     [[site.url]]                               # repeatable: explicit extra URLs
 #     loc        = "https://media.example.com/index.html"

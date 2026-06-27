@@ -314,6 +314,7 @@ ignored path with a `!` negation.
 | `default_priority`                      | float       | inherits | Priority assigned to every walked entry.                                     |
 | `directory_urls`                        | bool        | `true`   | Emit directory listing URLs; set `false` for a files-only sitemap.           |
 | `[[site.directory]]`                    | table array | `[]`     | `path` (on disk) mapped to `url` (prefix).                                   |
+| `[[site.directory]].directory_urls`     | bool        | inherits | Per-directory override of `directory_urls` (else the site value).            |
 | `[[site.url]]`                          | table array | `[]`     | Explicit `loc` with optional `changefreq`/`priority`.                        |
 | `[site.filters].keep`                   | array       | `[]`     | Allowlist patterns: index **only** matching files (`ignore` then subtracts). |
 | `[site.filters].ignore`                 | array       | `[]`     | Ignore patterns; appended after the global ones.                             |

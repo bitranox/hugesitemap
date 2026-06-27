@@ -39,10 +39,13 @@ class DirectoryRequest:
     Attributes:
         root: Absolute on-disk path to walk.
         url_prefix: URL prefix that ``root`` maps to.
+        directory_urls: Per-directory override of the request's
+            ``directory_urls``; ``None`` inherits the request value.
     """
 
     root: str
     url_prefix: str
+    directory_urls: bool | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -101,12 +104,13 @@ def _iter_entries(
 ) -> Iterator[SitemapEntry]:
     """Yield every entry for the request, one at a time (no materialisation)."""
     for directory in request.directories:
+        directory_urls = request.directory_urls if directory.directory_urls is None else directory.directory_urls
         yield from content_source(
             root=directory.root,
             url_prefix=directory.url_prefix,
             filter_spec=request.filter_spec,
             default_priority=request.default_priority,
-            directory_urls=request.directory_urls,
+            directory_urls=directory_urls,
         )
     yield from request.explicit_entries
 

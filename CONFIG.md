@@ -427,6 +427,7 @@ output_path = "/srv/www/www/sitemap.xml"
 | `default_priority`                      | float       | inherits | Priority assigned to every walked entry.                                                |
 | `directory_urls`                        | bool        | `true`   | Emit directory listing URLs; set `false` for a files-only sitemap.                      |
 | `[[site.directory]]`                    | table array | `[]`     | Repeatable: on-disk `path` mapped to `url` (prefix).                                    |
+| `[[site.directory]].directory_urls`     | bool        | inherits | Per-directory override of `directory_urls` (else the site / global value).              |
 | `[[site.url]]`                          | table array | `[]`     | Repeatable: explicit `loc` with optional `changefreq` and `priority` (default `0.5`).   |
 | `[site.filters].keep`                   | array       | `[]`     | Allowlist patterns: index **only** matching files (the `ignore` side then subtracts).   |
 | `[site.filters].ignore`                 | array       | `[]`     | Ignore patterns; appended after the global ones.                                        |
@@ -527,21 +528,33 @@ Worked example, with `nested_ignore_filename = ".sitemapignore"`:
 
 By default the sitemap lists a **directory URL** (trailing `/`) for every directory
 the walk visits, plus a **file URL** per surviving file. Set `directory_urls = false`
-(per site, or globally under `[sitemap]`) to emit **only file URLs**. The tree is
-still walked and filtered exactly the same way - only the directory listing URLs are
-left out.
+(per site, globally under `[sitemap]`, or **per `[[site.directory]]`**) to emit **only
+file URLs**. The tree is still walked and filtered exactly the same way - only the
+directory listing URLs are left out.
 
 Use it when the directory listings are low-value autoindex pages you do not want a
 search engine to crawl or index, so the sitemap carries just the real content (e.g.
 the files, or with `keep` the files of one type). Explicit `[[site.url]]` entries are
-never affected. If a few directory pages *are* worth indexing (real category/landing
-pages), keep `directory_urls = false` and add those pages back as `[[site.url]]`
-entries.
+never affected.
+
+It resolves per directory: a `[[site.directory]]` with its own `directory_urls` wins;
+otherwise the site value applies; otherwise the global `[sitemap]` value; otherwise
+the built-in default (`true`). So one site can keep directory pages for a meaningful
+tree and drop them for a noisy one:
 
 ```toml
 [[site]]
 # ...
-directory_urls = false        # files-only sitemap
+directory_urls = false        # site default: files-only
+
+  [[site.directory]]          # numeric buckets -> files only (inherits false)
+  path = "/srv/www/a000"
+  url  = "https://example.com/a000/"
+
+  [[site.directory]]          # real category tree -> keep its listing pages
+  path = "/srv/www/catalog"
+  url  = "https://example.com/catalog/"
+  directory_urls = true
 ```
 
 ### Selecting Sites

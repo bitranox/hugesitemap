@@ -186,7 +186,7 @@ domain types and stdlib; never touches the filesystem or lxml directly.
 
 | Symbol                                                     | Description                                                                                                                                                   |
 |------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `DirectoryRequest`                                         | One on-disk root (`root`) mapped to a URL prefix (`url_prefix`)                                                                                               |
+| `DirectoryRequest`                                         | One on-disk root (`root`) mapped to a URL prefix (`url_prefix`), with optional per-directory `directory_urls` override                                        |
 | `GenerateRequest`                                          | Full input for one site: `base_url`, `output_path`, `gzip`, `default_priority`, `directories`, `explicit_entries`, `filter_spec`, `directory_urls`, `dry_run` |
 | `GenerateResult`                                           | Outcome: `url_count`, `paths_written`, `was_split`                                                                                                            |
 | `generate_sitemap(request, content_source, write_sitemap)` | Walk directories, append explicit entries, split into protocol-compliant documents, and write (unless dry-run)                                                |

@@ -6,6 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-06-27
+
+### Added
+- `directory_urls` is now overridable **per `[[site.directory]]`**, not just per site.
+  A directory's own value wins, else the site value, else the global `[sitemap]`
+  value, else the default (`true`). This lets one site keep directory listing URLs
+  for a meaningful tree while dropping them for a noisy one (e.g. files-only numeric
+  buckets plus a full category tree), without enumerating directory URLs by hand.
+  Surfaced as an optional `DirectoryRequest.directory_urls` / `DirectorySpec`
+  field (`None` inherits).
+
 ## [2.2.0] - 2026-06-27
 
 ### Added

@@ -26,12 +26,20 @@ from hugesitemap.domain.errors import ConfigurationError
 
 
 class DirectorySpec(BaseModel):
-    """A configured directory: on-disk path mapped to a URL prefix."""
+    """A configured directory: on-disk path mapped to a URL prefix.
+
+    Attributes:
+        path: On-disk directory to walk.
+        url: URL prefix that ``path`` maps to.
+        directory_urls: Per-directory override of the site's ``directory_urls``;
+            ``None`` (default) inherits the site value.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
     path: str
     url: str
+    directory_urls: bool | None = None
 
 
 class ExplicitUrl(BaseModel):

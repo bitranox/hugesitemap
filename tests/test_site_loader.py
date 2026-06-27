@@ -134,6 +134,19 @@ def test_global_keep_extends_site_keep() -> None:
     assert sites[0].filters.keep == ["*.pdf", "*.html"]
 
 
+def test_directory_directory_urls_override_loads() -> None:
+    site = {
+        **WWW,
+        "directory": [
+            {"path": "/a", "url": "https://www.test/a/"},
+            {"path": "/b", "url": "https://www.test/b/", "directory_urls": True},
+        ],
+    }
+    dirs = load_sites(_config(site))[0].directories
+    assert dirs[0].directory_urls is None  # inherits the site value
+    assert dirs[1].directory_urls is True  # explicit per-directory override
+
+
 def test_directory_urls_defaults_true_and_loads() -> None:
     assert load_sites(_config(WWW))[0].directory_urls is True
     site = {**WWW, "directory_urls": False}
