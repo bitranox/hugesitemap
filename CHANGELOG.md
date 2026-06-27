@@ -11,6 +11,11 @@ adheres to [Semantic Versioning](https://semver.org/).
   `is_ignored` stat when a site configures no filters (`FilterSpec.is_empty`),
   removing parser construction and one `stat` per path for unfiltered sites.
 
+### Documentation
+- `examples/sites.toml` now shows `ignore_file` and `nested_ignore_filename` on a
+  real site, so all three filter sources have a copyable example (previously only
+  inline `ignore` was demonstrated).
+
 ## [2.0.1] - 2026-06-27
 
 ### Documentation

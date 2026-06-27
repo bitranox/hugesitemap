@@ -59,3 +59,10 @@ gzip        = true                          # override the global default for th
   [[site.directory]]
   path = "/srv/www/files/downloads"
   url  = "https://files.example.com/downloads/"
+
+  [site.filters]
+  # The other two filter sources (both optional). Rule precedence is: global
+  # ignore < this site's ignore < ignore_file < the nested per-directory files
+  # (deepest wins), exactly like git.
+  ignore_file = "/srv/www/files/.sitemapignore"   # a .gitignore-format rule file
+  nested_ignore_filename = ".sitemapignore"       # also honour one per subdirectory
