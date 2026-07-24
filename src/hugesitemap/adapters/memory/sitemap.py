@@ -13,15 +13,19 @@ Contents:
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-
-from lib_layered_config import Config
+from typing import TYPE_CHECKING
 
 from hugesitemap.adapters.config.site_loader import SiteConfig, load_sites
-from hugesitemap.domain.filters import FilterSpec
-from hugesitemap.domain.model import SitemapDocument, SitemapEntry
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from lib_layered_config import Config
+
+    from hugesitemap.domain.filters import FilterSpec
+    from hugesitemap.domain.model import SitemapDocument, SitemapEntry
 
 
 class InMemoryContentSource:

@@ -7,13 +7,16 @@ so an absolute path under ``root`` is what gets matched.
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
 from hugesitemap.adapters.gitignore_filter import build_filter
 from hugesitemap.domain.errors import ConfigurationError
 from hugesitemap.domain.filters import FilterSpec
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _tree(root: Path) -> None:

@@ -6,6 +6,26 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.3.1] 2026-07-24 13:49:42
+
+### Fixed
+- CI: resolve latest-ruff violations (PLR0917, PLC0415, RUF002) that turned red on the
+  scheduled floating-`ruff` job. `cli_config_deploy` and `_execute_deploy` now take their
+  options keyword-only instead of tripping the too-many-positional-arguments check.
+
+### Changed
+- Removed the blanket `[tool.ruff.lint].ignore` list (RUF002, RUF022, PLC0415, TC001-3,
+  TC006) in favor of fixing each rule at the root: ASCII hyphens instead of en-dashes in
+  docstrings, sorted `__all__`, top-level imports where nothing needed deferring (with a
+  `# noqa: PLC0415` plus a reason kept only for the two genuine cases - breaking the
+  `root`/`commands` circular import, and keeping the in-memory test doubles out of the
+  production import path), and the autofixed `TYPE_CHECKING`-only imports for stdlib/
+  third-party types and `cast()` expressions.
+- Added `[tool.ruff.lint.flake8-type-checking] runtime-evaluated-base-classes =
+  ["pydantic.BaseModel"]` so Pydantic model fields stay resolvable at runtime.
+- Added `PLC0415` to the `tests/*.py` per-file-ignore list; deferred imports inside a test
+  body are a deliberate idiom there and are left untouched.
+
 ## [2.3.0] - 2026-06-27
 
 ### Added

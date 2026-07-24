@@ -12,7 +12,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import rich_click as click
-from lib_layered_config import Config
 
 from hugesitemap import __init__conf__
 from hugesitemap.adapters.config.overrides import apply_overrides
@@ -22,6 +21,8 @@ from .context import apply_traceback_preferences, store_cli_context
 from .typed_click import option, version_option
 
 if TYPE_CHECKING:
+    from lib_layered_config import Config
+
     from hugesitemap.composition import AppServices
 
 
@@ -130,7 +131,7 @@ def cli(
 # the ``cli`` group, commands register themselves onto it, and those command
 # modules import from package ancestors. This is the standard Click pattern.
 def _register_commands() -> None:
-    from .commands import (
+    from .commands import (  # noqa: PLC0415 - breaks circular import, see comment above
         cli_config,
         cli_config_deploy,
         cli_config_generate_examples,

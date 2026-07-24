@@ -23,25 +23,25 @@ from .limits import MAX_BYTES, MAX_URLS
 from .model import SitemapDocument, SitemapEntry, SitemapIndexEntry
 
 __all__ = [
+    # Limits
+    "MAX_BYTES",
+    "MAX_URLS",
+    # Enums
+    "ChangeFreq",
+    # Errors
+    "ConfigurationError",
+    "DeployTarget",
+    # Filters
+    "FilterSpec",
+    "OutputFormat",
     # Model
     "SitemapDocument",
     "SitemapEntry",
     "SitemapIndexEntry",
-    # Enums
-    "ChangeFreq",
-    "DeployTarget",
-    "OutputFormat",
-    # Errors
-    "ConfigurationError",
     "SitemapValidationError",
-    # Filters
-    "FilterSpec",
     # Formatting
     "format_priority",
     "iso8601_z",
     "join_url",
     "mtime_to_utc",
-    # Limits
-    "MAX_BYTES",
-    "MAX_URLS",
 ]

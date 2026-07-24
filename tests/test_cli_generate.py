@@ -7,19 +7,23 @@ reads them), while the filesystem walker and lxml writer run for real.
 from __future__ import annotations
 
 import dataclasses
-from collections.abc import Callable, Sequence
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
-from click.testing import CliRunner
-from lib_layered_config import Config
 
 from hugesitemap.adapters import cli as cli_mod
 from hugesitemap.adapters.cli.exit_codes import ExitCode
 from hugesitemap.composition import AppServices, build_production
 from hugesitemap.domain.errors import SitemapValidationError
-from hugesitemap.domain.model import SitemapDocument
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+    from pathlib import Path
+
+    from click.testing import CliRunner
+    from lib_layered_config import Config
+
+    from hugesitemap.domain.model import SitemapDocument
 
 
 def _site_dict(tmp_path: Path, name: str, *, gzip: bool = False) -> dict[str, Any]:

@@ -19,7 +19,6 @@ Contents:
 
 from __future__ import annotations
 
-from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -29,6 +28,8 @@ from ..domain.limits import MAX_URLS
 from ..domain.model import SitemapDocument, SitemapEntry
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
     from .ports import ContentSource, SitemapWriter
 
 

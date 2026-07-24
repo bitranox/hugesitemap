@@ -12,18 +12,18 @@ System Role:
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
-from pathlib import Path
 from typing import TYPE_CHECKING, Protocol
 
-from ..domain.enums import DeployTarget, OutputFormat
-from ..domain.filters import FilterSpec
-from ..domain.model import SitemapDocument, SitemapEntry
-
 if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+    from pathlib import Path
+
     from lib_layered_config import Config
 
     from ..adapters.config.site_loader import SiteConfig
+    from ..domain.enums import DeployTarget, OutputFormat
+    from ..domain.filters import FilterSpec
+    from ..domain.model import SitemapDocument, SitemapEntry
 
 
 class GetConfig(Protocol):

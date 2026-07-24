@@ -18,7 +18,6 @@ from typing import TYPE_CHECKING
 import lib_log_rich.runtime
 import rich_click as click
 
-from hugesitemap.adapters.config.site_loader import SiteConfig
 from hugesitemap.application.generate import (
     DirectoryRequest,
     GenerateRequest,
@@ -35,6 +34,7 @@ from ..exit_codes import ExitCode
 from ..typed_click import option
 
 if TYPE_CHECKING:
+    from hugesitemap.adapters.config.site_loader import SiteConfig
     from hugesitemap.composition import AppServices
 
 logger = logging.getLogger(__name__)

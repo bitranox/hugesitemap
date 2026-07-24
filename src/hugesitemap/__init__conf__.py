@@ -22,17 +22,17 @@ from __future__ import annotations
 import sys
 
 __all__ = [
-    "name",
-    "title",
-    "version",
-    "homepage",
-    "author",
-    "author_email",
-    "shell_command",
-    "LAYEREDCONF_VENDOR",
     "LAYEREDCONF_APP",
     "LAYEREDCONF_SLUG",
+    "LAYEREDCONF_VENDOR",
+    "author",
+    "author_email",
+    "homepage",
+    "name",
     "print_info",
+    "shell_command",
+    "title",
+    "version",
 ]
 
 #: Distribution name declared in ``pyproject.toml``.
@@ -40,7 +40,7 @@ name = "hugesitemap"
 #: Human-readable summary shown in CLI help output.
 title = "Generate sitemap.xml (sitemaps.org 0.9) by scanning a site's content directories"
 #: Current release version pulled from ``pyproject.toml`` by automation.
-version = "2.3.0"
+version = "2.3.1"
 #: Repository homepage presented to users.
 homepage = "https://github.com/bitranox/hugesitemap"
 #: Author attribution surfaced in CLI output.

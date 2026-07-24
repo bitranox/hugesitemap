@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import os
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from hugesitemap.adapters.filesystem import walk_directory
 from hugesitemap.domain.filters import FilterSpec
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 PREFIX = "https://media.test/a000/"
 

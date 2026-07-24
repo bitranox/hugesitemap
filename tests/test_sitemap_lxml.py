@@ -9,10 +9,13 @@ from __future__ import annotations
 import gzip
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from hugesitemap.adapters.sitemap_lxml import SITEMAP_NS, write_sitemap
 from hugesitemap.domain.model import SitemapDocument, SitemapEntry
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 NS = {"sm": SITEMAP_NS}
 XSI = "http://www.w3.org/2001/XMLSchema-instance"

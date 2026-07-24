@@ -14,13 +14,17 @@ Contents:
 from __future__ import annotations
 
 import os
-from collections.abc import Iterator
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from hugesitemap.adapters.gitignore_filter import build_filter
-from hugesitemap.domain.filters import FilterSpec
 from hugesitemap.domain.formatting import join_url, mtime_to_utc
 from hugesitemap.domain.model import SitemapEntry
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from hugesitemap.domain.filters import FilterSpec
 
 
 def _dir_loc(url_prefix: str, rel_posix: str) -> str:

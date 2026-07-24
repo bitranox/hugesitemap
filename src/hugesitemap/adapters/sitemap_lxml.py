@@ -13,10 +13,9 @@ Contents:
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
-from datetime import datetime
 from itertools import chain
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from hugesitemap.domain.errors import SitemapValidationError
 from hugesitemap.domain.formatting import format_priority, iso8601_z, join_url
@@ -24,6 +23,10 @@ from hugesitemap.domain.model import SitemapDocument, SitemapEntry, SitemapIndex
 
 from . import typed_lxml as xml
 from .typed_deflate import gzip_compress
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+    from datetime import datetime
 
 SITEMAP_NS = "http://www.sitemaps.org/schemas/sitemap/0.9"
 XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"

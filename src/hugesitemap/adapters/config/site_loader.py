@@ -17,12 +17,14 @@ Contents:
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
-from lib_layered_config import Config
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from hugesitemap.domain.errors import ConfigurationError
+
+if TYPE_CHECKING:
+    from lib_layered_config import Config
 
 
 class DirectorySpec(BaseModel):

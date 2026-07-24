@@ -31,11 +31,14 @@ Contents:
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import igittigitt
 
 from ..domain.errors import ConfigurationError
-from ..domain.filters import FilterSpec
+
+if TYPE_CHECKING:
+    from ..domain.filters import FilterSpec
 
 
 class GitignoreFilter:

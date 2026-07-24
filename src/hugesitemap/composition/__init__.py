@@ -81,7 +81,7 @@ def build_testing(*, writer: SitemapWriter | None = None) -> AppServices:
     Returns:
         AppServices container with in-memory adapters.
     """
-    from ..adapters.memory import (
+    from ..adapters.memory import (  # noqa: PLC0415 - keeps test-only doubles out of the production import path
         SitemapWriterSpy,
         content_source_empty,
         deploy_configuration_in_memory,
@@ -105,19 +105,19 @@ def build_testing(*, writer: SitemapWriter | None = None) -> AppServices:
 
 
 __all__ = [
-    # Configuration
-    "get_config",
-    "get_default_config_path",
-    "deploy_configuration",
-    "display_config",
-    "load_sites",
-    # Sitemap
-    "walk_directory",
-    "write_sitemap",
-    # Logging
-    "init_logging",
     # Composition
     "AppServices",
     "build_production",
     "build_testing",
+    "deploy_configuration",
+    "display_config",
+    # Configuration
+    "get_config",
+    "get_default_config_path",
+    # Logging
+    "init_logging",
+    "load_sites",
+    # Sitemap
+    "walk_directory",
+    "write_sitemap",
 ]
