@@ -49,10 +49,10 @@ adheres to [Semantic Versioning](https://semver.org/).
   force for the fallback; only a refused `LOG_*` variable makes the fallback start without them
   (they are put back afterwards).
 - **`[lib_layered_config.default_permissions]` now takes effect, and only the configuration
-  files decide it.** The per-layer modes were read, but only `enabled` was ever used, so
-  `--set lib_layered_config.default_permissions.user_directory='"0o750"'` still produced a `0o700`
-  directory. `config-deploy` now hands its options and any `--set` of the section to
-  lib_layered_config, which deploys each target with its configured directory and file mode
+  files decide it (exit codes changed).** The per-layer modes were read, but only `enabled` was
+  ever used, so `--set lib_layered_config.default_permissions.user_directory='"0o750"'` still
+  produced a `0o700` directory. `config-deploy` now hands its options and any `--set` of the
+  section to lib_layered_config, which deploys each target with its configured directory and file mode
   (`--dir-mode`/`--file-mode` still win) and reads the section itself: from the bundled
   defaults, the configuration files the deploy does not overwrite and the environment, never
   from `.env` (nor `--env-file`). So a `.env` in the working directory can neither change a
@@ -62,7 +62,11 @@ adheres to [Semantic Versioning](https://semver.org/).
   non-boolean `enabled`, a section that is not a table or an unknown key stops the command with
   exit **78** before anything is written: one `Error:` line per problem naming the key and where
   it was set (`(source: override)` for a `--set`), then, for a configured value, a hint that
-  both `--dir-mode` and `--file-mode` deploy anyway. `--no-permissions` together with
+  both `--dir-mode` and `--file-mode` deploy anyway. A decimal integer such as `493` (`0o755`)
+  was documented as an accepted mode format in `40-layered-config.toml` and `CONFIG.md` up to
+  2.3.1, and such a value was ignored, so the deploy ran (exit 0); it is now refused with exit
+  **78** like any bare integer. Write the mode as an octal string instead (`app_directory =
+  "0o755"` in TOML, `0o755` in an environment variable). `--no-permissions` together with
   `--dir-mode` or `--file-mode` is a usage error (exit **2**). "Deployed configuration" is logged
   after the deploy succeeded rather than announced before it.
 - **A configuration that does not load no longer stops every command (exit codes changed).**
