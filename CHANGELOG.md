@@ -16,6 +16,20 @@ adheres to [Semantic Versioning](https://semver.org/).
   import is missing from `[project].dependencies`.
 
 ### Fixed
+- **Logging takes only `LOG_*` lines from a `.env`.** `init_logging` called lib_log_rich's
+  `enable_dotenv()`, which copied every line of the nearest `.env` into the process environment,
+  so a later configuration load (`config --profile`) read an app-prefixed `.env` line
+  (`HUGESITEMAP___LIB_LOG_RICH__SERVICE=...`) as if it were set in the environment, even under
+  `--env-file`. Logging now copies only `LOG_*` lines, never over a variable already set, from
+  the `--env-file` when given, otherwise from the nearest `.env` up to the project root, without
+  `chdir` and passing over unreadable directories; a `.env` that is not UTF-8 no longer stops
+  logging. `python-dotenv` is a declared dependency.
+- **An invalid `[lib_log_rich]` value is a configuration error (exit codes changed).** A value
+  lib_log_rich refuses (a wrong type such as `rate_limit = "100:60"`, or its own range checks
+  such as `queue_maxsize = 0`) exited **22** from every command with pydantic's multi-line
+  report. Logging now starts with its defaults and the failure is recorded like a broken file:
+  `config` and `generate` exit **78** with one `Error: lib_log_rich.<key>: <reason>` line per
+  problem, never repeating the value, and `info` and `config-deploy` still run.
 - **`[lib_layered_config.default_permissions]` now takes effect, and only the configuration
   files decide it.** The per-layer modes were read, but only `enabled` was ever used, so
   `--set lib_layered_config.default_permissions.user_directory='"0o750"'` still produced a `0o700`

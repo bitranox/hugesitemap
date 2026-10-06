@@ -669,7 +669,10 @@ Configuration can be overridden via environment variables using two methods:
 
 ### Method 1: Native lib_log_rich Variables
 
-For logging configuration, use the native `LOG_*` variables (highest precedence):
+For logging configuration, use the native `LOG_*` variables (highest precedence). A `.env`
+file can carry them too: logging copies only its `LOG_*` lines into the environment, from the
+`--env-file` when given, otherwise from the nearest `.env` up to the project root, and never
+over a variable that is already set. No other line of a `.env` reaches the environment.
 
 ```bash
 LOG_CONSOLE_LEVEL=DEBUG hugesitemap info

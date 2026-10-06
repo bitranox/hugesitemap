@@ -285,10 +285,11 @@ with a CLI-ready message.
 
 ### logging/setup.py - Logging initialization
 
-| Symbol                 | Description                                                                        |
-|------------------------|------------------------------------------------------------------------------------|
-| `LoggingConfigModel`   | Pydantic model for the `[lib_log_rich]` config section (extra fields pass through) |
-| `init_logging(config)` | Idempotent lib_log_rich runtime initialization from layered config                 |
+| Symbol                                      | Description                                                                                                                                                                               |
+|---------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `LoggingConfigModel`                        | Pydantic model for the `[lib_log_rich]` config section (extra fields pass through)                                                                                                        |
+| `init_logging(config, *, dotenv_path=None)` | Idempotent lib_log_rich runtime initialization from layered config; copies only the `LOG_*` lines of the `--env-file` (or the nearest `.env` up to the project root) into the environment |
+| `InvalidLoggingConfigError`                 | A `ConfigurationError` carrying one `lib_log_rich.<key>: <reason>` line per value lib_log_rich refuses; the root records it like a load failure (`config_load.start_logging`)             |
 
 ---
 
@@ -353,7 +354,8 @@ Registered in `adapters/cli/root.py`: `info`, `generate`, `fail`, `config`,
 The root loads the configuration before any subcommand runs (`config_load.load_config`). A
 malformed or conflicting `--set` or an invalid `--profile` name is a usage error (exit 2) for
 every command, checked before loading. A file that does not load (invalid TOML, a `.env` that
-is not UTF-8, an unreadable file) is recorded, not raised: `config` and `generate` refuse with
+is not UTF-8, an unreadable file), and a `[lib_log_rich]` value lib_log_rich refuses (logging then
+starts with its defaults), is recorded, not raised: `config` and `generate` refuse with
 exit 78 and one `Error:` line naming it (`--traceback` adds the loader's traceback), while
 `info`, `config-deploy`, `config-generate-examples` and `--help` still run.
 
