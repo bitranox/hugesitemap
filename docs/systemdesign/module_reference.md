@@ -52,7 +52,7 @@ Complete (current codebase)
 - `src/hugesitemap/adapters/memory/__init__.py` - Public facade for in-memory adapters
 - `src/hugesitemap/adapters/memory/config.py` - In-memory config adapters
 - `src/hugesitemap/adapters/memory/sitemap.py` - In-memory content source, writer spy, site-config loader
-- `src/hugesitemap/adapters/memory/logging.py` - In-memory logging (no-op)
+- `src/hugesitemap/adapters/memory/logging.py` - In-memory logging (quiet lib_log_rich runtime)
 
 ### Composition Layer
 - `src/hugesitemap/composition/__init__.py` - Wires adapters to ports (AppServices, build_production, build_testing)
@@ -500,7 +500,7 @@ The `adapters/memory/` package provides lightweight implementations for testing:
 |---------------------|---------------------------------------------------------------------------------------------------------------------------|
 | `memory/config.py`  | `get_config_in_memory`, `get_default_config_path_in_memory`, `deploy_configuration_in_memory`, `display_config_in_memory` |
 | `memory/sitemap.py` | `InMemoryContentSource`, `content_source_empty`, `SitemapWriterSpy`, `load_sites_in_memory`                               |
-| `memory/logging.py` | `init_logging_in_memory` (no-op)                                                                                          |
+| `memory/logging.py` | `init_logging_in_memory` (quiet runtime)                                                                                  |
 
 Use `composition.build_testing()` to wire all in-memory adapters. The `SitemapWriterSpy`
 records write calls instead of touching disk; `load_sites_in_memory` delegates to the

@@ -6,6 +6,18 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- **`build_testing()` can run a command.** The in-memory logging initializer was a no-op while every
+  command binds job context onto the lib_log_rich runtime, so any command under the testing
+  composition raised `RuntimeError('lib_log_rich.init() must be called before using the logging
+  API')`. It now starts a quiet runtime (no journald, event log, Graylog or queue; console at ERROR;
+  no `.env` loading). The conftest fixtures that build services use it too, so their stderr no
+  longer carries queued INFO lines by timing.
+- **Tests no longer pass or fail by order or by machine.** An autouse fixture shuts the lib_log_rich
+  runtime down and restores the root logger's handlers, level and propagate flag after every test,
+  and another pins rich-click's colour and width globals, so CI (GITHUB_ACTIONS set, 79-column
+  Windows runners) renders the same plain output as a developer terminal.
+
 ## [2.3.1] 2026-07-24 13:49:42
 
 ### Fixed

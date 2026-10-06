@@ -1,7 +1,7 @@
 """In-memory adapter implementations for testing.
 
 Provides lightweight implementations of the application ports that operate
-entirely in memory -- no filesystem, no lxml, no logging framework.
+entirely in memory -- no filesystem and no lxml; the logging adapter starts a quiet runtime.
 
 Contents:
     * :mod:`.config` - In-memory configuration adapters
