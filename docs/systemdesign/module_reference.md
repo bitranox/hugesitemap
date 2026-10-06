@@ -32,7 +32,6 @@ Complete (current codebase)
 - `src/hugesitemap/adapters/config/deploy.py` - Configuration deployment
 - `src/hugesitemap/adapters/config/display.py` - Configuration display (delegates to lib_layered_config)
 - `src/hugesitemap/adapters/config/overrides.py` - CLI `--set` override parsing and deep-merge
-- `src/hugesitemap/adapters/config/permissions.py` - File permission defaults for deploy targets
 - `src/hugesitemap/adapters/config/site_loader.py` - Per-site config models and multi-site loader (load_sites)
 - `src/hugesitemap/adapters/logging/setup.py` - lib_log_rich initialization
 - `src/hugesitemap/adapters/cli/` - CLI adapter package:
@@ -264,9 +263,9 @@ with a CLI-ready message.
 
 ### config/deploy.py - Configuration deployment
 
-| Function                                                                              | Description                                                              |
-|---------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| `deploy_configuration(targets, force, profile, set_permissions, dir_mode, file_mode)` | Copy the bundled defaults to app/host/user layers; returns created paths |
+| Function                                                                                                    | Description                                                                                                    |
+|-------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| `deploy_configuration(targets, force, profile, set_permissions, dir_mode, file_mode, permission_overrides)` | Copy the bundled defaults to app/host/user layers; lib_layered_config decides the modes; returns created paths |
 
 ### config/display.py - Configuration display
 
@@ -276,21 +275,13 @@ with a CLI-ready message.
 
 ### config/overrides.py - `--set` override parsing
 
-| Symbol                          | Description                                                                         |
-|---------------------------------|-------------------------------------------------------------------------------------|
-| `ConfigOverride`                | Parsed override: `section`, `key_path` tuple, coerced `value`                       |
-| `parse_override(raw)`           | Split `SECTION.KEY[.SUBKEY...]=VALUE` into a `ConfigOverride`                       |
-| `coerce_value(raw)`             | Coerce a raw string via JSON parsing, falling back to the string                    |
-| `nest_overrides(raw)`           | Parse all `--set` values together into a nested tree; refuse conflicting keys       |
-| `apply_overrides(config, raw)`  | Deep-merge the nested `--set` tree into a `Config`                                  |
-
-### config/permissions.py - Deploy permission defaults
-
-| Symbol                            | Description                                                          |
-|-----------------------------------|----------------------------------------------------------------------|
-| `PermissionDefaults`              | Validated, immutable per-layer permission modes plus an enabled flag |
-| `parse_mode(value, default)`      | Parse a mode from an int or octal string (`"0o755"`, `"755"`)        |
-| `get_permission_defaults(config)` | Load defaults from `[lib_layered_config.default_permissions]`        |
+| Symbol                         | Description                                                                   |
+|--------------------------------|-------------------------------------------------------------------------------|
+| `ConfigOverride`               | Parsed override: `section`, `key_path` tuple, coerced `value`                 |
+| `parse_override(raw)`          | Split `SECTION.KEY[.SUBKEY...]=VALUE` into a `ConfigOverride`                 |
+| `coerce_value(raw)`            | Coerce a raw string via JSON parsing, falling back to the string              |
+| `nest_overrides(raw)`          | Parse all `--set` values together into a nested tree; refuse conflicting keys |
+| `apply_overrides(config, raw)` | Deep-merge the nested `--set` tree into a `Config`                            |
 
 ### logging/setup.py - Logging initialization
 
@@ -408,16 +399,16 @@ Display the merged configuration from all sources (defaults -> app -> host -> us
 
 Deploy default configuration to system or user directories.
 
-| Option                             | Description                                                               |
-|------------------------------------|---------------------------------------------------------------------------|
-| `--target [app\|host\|user]`       | Target layer(s) - required, repeatable                                    |
-| `--force`                          | Overwrite existing files                                                  |
-| `--profile NAME`                   | Deploy to a profile subdirectory                                          |
-| `--permissions / --no-permissions` | Set Unix permissions (755/644 app/host, 700/600 user); enabled by default |
-| `--dir-mode MODE`                  | Override directory mode (octal, e.g. `750` or `0o750`)                    |
-| `--file-mode MODE`                 | Override file mode (octal, e.g. `640` or `0o640`)                         |
+| Option                             | Description                                                                                                |
+|------------------------------------|------------------------------------------------------------------------------------------------------------|
+| `--target [app\|host\|user]`       | Target layer(s) - required, repeatable                                                                     |
+| `--force`                          | Replace a file whose content differs, keeping the old one as `<name>.bak`                                  |
+| `--profile NAME`                   | Deploy to a profile subdirectory                                                                           |
+| `--permissions / --no-permissions` | Set Unix permissions or leave them to the umask; neither: the configured `enabled` decides (on when unset) |
+| `--dir-mode MODE`                  | Override directory mode (octal, e.g. `750` or `0o750`)                                                     |
+| `--file-mode MODE`                 | Override file mode (octal, e.g. `640` or `0o640`)                                                          |
 
-**Exit codes:** 0, 1, 2 (invalid `--profile` name), 13 (permission denied)
+**Exit codes:** 0, 1, 2 (usage error, including a refused `--dir-mode`/`--file-mode` or `--profile` name, and `--no-permissions` together with a mode), 13 (permission denied), 78 (lib_layered_config refused the permission settings: a configured one, which both `--dir-mode` and `--file-mode` or `--no-permissions` deploy past, or a `--set` of `lib_layered_config.default_permissions`)
 
 ### config-generate-examples
 

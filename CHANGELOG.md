@@ -13,6 +13,23 @@ adheres to [Semantic Versioning](https://semver.org/).
   one as `<name>.bak`; a file that already holds the bundled content is left alone.
 
 ### Fixed
+- **`[lib_layered_config.default_permissions]` now takes effect, and only the configuration
+  files decide it.** The per-layer modes were read, but only `enabled` was ever used, so
+  `--set lib_layered_config.default_permissions.user_directory='"0o750"'` still produced a `0o700`
+  directory. `config-deploy` now hands its options and any `--set` of the section to
+  lib_layered_config, which deploys each target with its configured directory and file mode
+  (`--dir-mode`/`--file-mode` still win) and reads the section itself: from the bundled
+  defaults, the configuration files the deploy does not overwrite and the environment, never
+  from `.env` (nor `--env-file`). So a `.env` in the working directory can neither change a
+  deployed mode nor block a deploy, and `config-deploy --force` replaces a deployed file that
+  does not parse or holds a bad value without further options. A malformed or out-of-range
+  mode, a bare integer (TOML `user_file = 400` is decimal 400, i.e. `0o620`), an unsafe mode, a
+  non-boolean `enabled`, a section that is not a table or an unknown key stops the command with
+  exit **78** before anything is written: one `Error:` line per problem naming the key and where
+  it was set (`(source: override)` for a `--set`), then, for a configured value, a hint that
+  both `--dir-mode` and `--file-mode` deploy anyway. `--no-permissions` together with
+  `--dir-mode` or `--file-mode` is a usage error (exit **2**). "Deployed configuration" is logged
+  after the deploy succeeded rather than announced before it.
 - **A configuration that does not load no longer stops every command (exit codes changed).**
   The root group loaded the configuration before any subcommand ran and let a load error
   escape, so a malformed `config.toml`, a `.env` that is not UTF-8 or an unreadable file made
@@ -49,6 +66,26 @@ adheres to [Semantic Versioning](https://semver.org/).
   discarding it. The exit codes themselves are unchanged. `config-deploy` re-raises a deliberate
   click `Exit` (a `RuntimeError` subclass) ahead of its catch-all, so it keeps its own code instead
   of becoming 1. `typed_click` gains a typed `get_current_context` wrapper.
+
+### Security
+- **`config-deploy` refuses unsafe and malformed modes itself, as a usage error (exit code
+  changed).** `--dir-mode`/`--file-mode` went through an unbounded octal parser that took
+  `-1`, `7777` or a 20-digit value and handed it to the deploy unchecked; the only check was
+  whichever one the installed lib_layered_config made, which under 7.x refused it inside the
+  deploy as "Failed to deploy configuration" (exit **1**). The
+  options now accept only a plain octal literal in `0`..`0o7777`, and refuse the
+  setuid/setgid/sticky bits, group and world write, an execute bit on a file, a directory
+  without owner `rwx` and a file without owner `rw`, naming each offending bit (exit **2**,
+  nothing written). The rule is lib_layered_config's `DeployMode`, the same one it applies to
+  configured modes; a zero-padded mode such as `0000750` is accepted as `0o750`.
+
+### Removed
+- `adapters.config.permissions` as a whole: `parse_mode` (whose silent fall-back to the default
+  was the bug), `get_permission_defaults` and the `PermissionDefaults` model.
+  lib_layered_config reads and validates the section now; a caller that wants the settings uses
+  its `deploy_permissions_from_config`. The deploy port (`DeployConfiguration`) takes
+  `set_permissions: bool | None` (None, the default, follows the configured `enabled`) and
+  `permission_overrides`.
 
 ## [2.3.1] 2026-07-24 13:49:42
 
