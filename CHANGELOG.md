@@ -16,6 +16,14 @@ adheres to [Semantic Versioning](https://semver.org/).
   import is missing from `[project].dependencies`.
 
 ### Fixed
+- **The documented `.env` and environment syntax for tables and lists works.** `.env.example`
+  and `defaultconfig.d/90-logging.toml` showed comma-separated `LEVEL=style` and `field=regex`
+  pairs for `console_styles` and `scrub_patterns`, and `host:port` / `100:60` strings for
+  `graylog_endpoint` and `rate_limit`; each arrives as one string and is refused. They now show
+  what works: a JSON object or array (shell-quoted in the environment, unquoted in `.env`) or one
+  key per entry (`LIB_LOG_RICH__SCRUB_PATTERNS__API_KEY=.+`), and say that an unquoted `.env`
+  value converts like the environment layer. `.env.example` no longer documents an `[email]`
+  section this application does not have.
 - **Logging takes only `LOG_*` lines from a `.env`.** `init_logging` called lib_log_rich's
   `enable_dotenv()`, which copied every line of the nearest `.env` into the process environment,
   so a later configuration load (`config --profile`) read an app-prefixed `.env` line
