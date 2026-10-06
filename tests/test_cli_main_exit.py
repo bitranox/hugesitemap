@@ -81,6 +81,17 @@ def test_a_sitemap_validation_failure_exits_1_without_printing_systemexit(
 
 
 @pytest.mark.os_agnostic
+def test_a_sitemap_that_cannot_be_written_exits_13(capsys: pytest.CaptureFixture[str], tmp_path: Path) -> None:
+    """The documented 13 of ``generate``: the writer's PermissionError reaches main()'s exit-code mapping."""
+    services = _services(_one_site(tmp_path), write_sitemap=_raising(PermissionError("denied")))
+    exit_code = main(["generate"], services_factory=services)
+
+    err = capsys.readouterr().err
+    assert exit_code == 13
+    assert "denied" in err
+
+
+@pytest.mark.os_agnostic
 def test_a_config_display_error_exits_22_without_printing_systemexit(capsys: pytest.CaptureFixture[str]) -> None:
     exit_code = main(["config"], services_factory=_services({}, display_config=_raising(ValueError("boom"))))
 
