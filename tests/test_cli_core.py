@@ -211,3 +211,17 @@ def test_when_logdemo_is_invoked_it_completes_successfully(
 
     assert result.exit_code == 0
     assert "Log demo completed" in result.output
+
+
+@pytest.mark.os_agnostic
+@pytest.mark.parametrize("command", sorted(cli_mod.cli.commands))
+def test_command_help_shows_neither_doctests_nor_a_literal_paragraph_marker(
+    cli_runner: CliRunner, command: str
+) -> None:
+    """Docstring examples are for the doctest run; ``\\f`` cuts them from ``--help``, and rich-click
+    prints click's ``\\b`` paragraph marker literally instead of honouring it."""
+    result = cli_runner.invoke(cli_mod.cli, [command, "--help"], obj=build_production)
+
+    assert result.exit_code == 0, result.output
+    assert ">>>" not in result.output
+    assert "\\b" not in result.output

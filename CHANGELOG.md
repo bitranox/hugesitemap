@@ -16,6 +16,9 @@ adheres to [Semantic Versioning](https://semver.org/).
   import is missing from `[project].dependencies`.
 
 ### Fixed
+- **Command help no longer prints a literal `\b` or the doctest examples.** rich-click prints
+  click's `\b` paragraph marker as text, and every command's `--help` ended with the
+  docstring's `>>>` examples. Each command docstring now stops the help at `\f`.
 - **The documented `.env` and environment syntax for tables and lists works.** `.env.example`
   and `defaultconfig.d/90-logging.toml` showed comma-separated `LEVEL=style` and `field=regex`
   pairs for `console_styles` and `scrub_patterns`, and `host:port` / `100:60` strings for

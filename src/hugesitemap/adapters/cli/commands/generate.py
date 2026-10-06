@@ -118,6 +118,7 @@ def _select_sites(sites: list[SiteConfig], requested: str) -> list[SiteConfig]:
 def cli_generate(ctx: click.Context, site_selector: str, dry_run: bool, gzip: bool) -> None:
     """Generate sitemap.xml for the configured sites selected by --site.
 
+    \f
     Example:
         >>> from click.testing import CliRunner
         >>> runner = CliRunner()
