@@ -6,7 +6,16 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- **Requires lib_layered_config 7.0.1.** An unquoted `.env` value now converts like the
+  environment layer, so `..._ENABLED=false` arrives as the boolean `false` rather than the text
+  `"false"`. `config-deploy --force` replaces only a file whose content differs and keeps the old
+  one as `<name>.bak`; a file that already holds the bundled content is left alone.
+
 ### Fixed
+- **`config-deploy --force` with nothing to write no longer tells you to use `--force`.** Under
+  lib_layered_config 7 an empty result with `--force` means every target file is already
+  current; the command now says so instead of repeating the hint the user just followed.
 - **`build_testing()` can run a command.** The in-memory logging initializer was a no-op while every
   command binds job context onto the lib_log_rich runtime, so any command under the testing
   composition raised `RuntimeError('lib_log_rich.init() must be called before using the logging

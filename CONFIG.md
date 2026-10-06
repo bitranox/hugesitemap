@@ -143,15 +143,15 @@ Deploy bundled default configuration to platform-specific directories.
 
 #### Options Reference
 
-| Option             | Required | Description                                                                       |
-|--------------------|:--------:|-----------------------------------------------------------------------------------|
-| `--target`         | Yes      | Target layer: `app`, `host`, or `user`. Can be specified multiple times.          |
-| `--force`          | No       | Overwrite existing configuration files. Without this, existing files are skipped. |
-| `--profile NAME`   | No       | Deploy to a profile-specific subdirectory (e.g., `profile/production/`).          |
-| `--permissions`    | No       | Enable Unix permission setting (default).                                         |
-| `--no-permissions` | No       | Disable permission setting; use system umask instead.                             |
-| `--dir-mode MODE`  | No       | Override directory permissions (octal: `750` or `0o750`).                         |
-| `--file-mode MODE` | No       | Override file permissions (octal: `640` or `0o640`).                              |
+| Option             | Required | Description                                                                                                                                                                   |
+|--------------------|:--------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `--target`         | Yes      | Target layer: `app`, `host`, or `user`. Can be specified multiple times.                                                                                                      |
+| `--force`          | No       | Replace an existing file whose content differs, keeping the old one as `<name>.bak`. A file whose content is unchanged is left alone. Without it, existing files are skipped. |
+| `--profile NAME`   | No       | Deploy to a profile-specific subdirectory (e.g., `profile/production/`).                                                                                                      |
+| `--permissions`    | No       | Enable Unix permission setting (default).                                                                                                                                     |
+| `--no-permissions` | No       | Disable permission setting; use system umask instead.                                                                                                                         |
+| `--dir-mode MODE`  | No       | Override directory permissions (octal: `750` or `0o750`).                                                                                                                     |
+| `--file-mode MODE` | No       | Override file permissions (octal: `640` or `0o640`).                                                                                                                          |
 
 #### Basic Examples
 

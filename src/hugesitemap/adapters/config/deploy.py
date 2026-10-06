@@ -40,8 +40,9 @@ def deploy_configuration(
         targets: Sequence of DeployTarget enum values specifying target layers.
             Valid values: DeployTarget.APP, DeployTarget.HOST, DeployTarget.USER.
             Multiple targets can be specified to deploy to several locations at once.
-        force: If True, overwrite existing configuration files. If False (default),
-            skip files that already exist.
+        force: If True, replace an existing configuration file whose content differs,
+            keeping the old one as ``<name>.bak``; a file whose content is unchanged is
+            left alone. If False (default), skip files that already exist.
         profile: Optional profile name for environment isolation. When specified,
             configuration is deployed to profile-specific subdirectories
             (e.g., ~/.config/slug/profile/<name>/config.toml).
@@ -55,7 +56,8 @@ def deploy_configuration(
 
     Returns:
         List of paths where configuration files were created or would be created.
-        Empty list if all target files already exist and force=False.
+        Empty list if all target files already exist and force=False, or if every one
+        already holds the bundled content and force=True.
 
     Raises:
         PermissionError: When deploying to app/host without sufficient privileges.

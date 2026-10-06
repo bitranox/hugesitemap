@@ -252,6 +252,27 @@ def test_when_config_deploy_finds_no_files_to_create_it_informs_user(
 
 
 @pytest.mark.os_agnostic
+def test_when_a_forced_deploy_writes_nothing_it_does_not_suggest_force(
+    cli_runner: CliRunner,
+    inject_deploy_configuration: Callable[[Callable[..., list[Path]]], Callable[[], Any]],
+) -> None:
+    """lib_layered_config leaves a file whose content is unchanged alone even under --force, so an
+    empty result there means every file is already current; telling the user to add --force would
+    send them round in a circle."""
+
+    def deploy_nothing(**_kwargs: Any) -> list[Path]:
+        return []
+
+    factory = inject_deploy_configuration(deploy_nothing)
+
+    result: Result = cli_runner.invoke(cli_mod.cli, ["config-deploy", "--target", "user", "--force"], obj=factory)
+
+    assert result.exit_code == 0
+    assert "already identical to the bundled one" in result.output
+    assert "Use --force" not in result.output
+
+
+@pytest.mark.os_agnostic
 def test_when_config_deploy_encounters_permission_error_it_handles_gracefully(
     cli_runner: CliRunner,
     inject_deploy_configuration: Callable[[Callable[..., list[Path]]], Callable[[], Any]],

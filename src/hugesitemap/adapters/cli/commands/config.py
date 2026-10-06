@@ -151,7 +151,7 @@ def _parse_octal_mode(ctx: click.Context, param: click.Parameter, value: str | N
     "--force",
     is_flag=True,
     default=False,
-    help="Overwrite existing configuration files",
+    help="Replace existing configuration files whose content differs (the old file is kept as <name>.bak)",
 )
 @option(
     "--profile",
@@ -199,7 +199,10 @@ def cli_config_deploy(
     - host: System-wide host config (requires privileges)
     - user: User-specific config (~/.config on Linux)
 
-    By default, existing files are not overwritten. Use --force to overwrite.
+    By default, existing files are not overwritten. With --force, a file whose
+    content differs is replaced and the old one is kept as <name>.bak (numbered,
+    <name>.bak.1 and so on, when a backup already exists); a file whose content is
+    unchanged is left as it is, mode included.
 
     \b
     Permission options (POSIX only, no-op on Windows):
@@ -274,7 +277,7 @@ def _execute_deploy(
             dir_mode=dir_mode,
             file_mode=file_mode,
         )
-        _report_deployment_result(deployed_paths, profile, effective_set_permissions)
+        _report_deployment_result(deployed_paths, profile, effective_set_permissions, force=force)
     except PermissionError as exc:
         logger.error("Permission denied when deploying configuration", extra={"error": str(exc)})
         click.echo(f"\nError: Permission denied. {exc}", err=True)
@@ -290,13 +293,17 @@ def _execute_deploy(
         get_current_context().exit(ExitCode.GENERAL_ERROR)
 
 
-def _report_deployment_result(deployed_paths: list[Path], profile: str | None, set_permissions: bool) -> None:
+def _report_deployment_result(
+    deployed_paths: list[Path], profile: str | None, set_permissions: bool, *, force: bool
+) -> None:
     """Report deployment results to the user.
 
     Args:
         deployed_paths: List of paths where configs were deployed.
         profile: Optional profile name for display.
         set_permissions: Whether permissions were set.
+        force: Whether ``--force`` was given. With it, an empty result means every target
+            file already holds the bundled content, so suggesting ``--force`` would be wrong.
     """
     if deployed_paths:
         profile_msg = f" (profile: {profile})" if profile else ""
@@ -307,6 +314,8 @@ def _report_deployment_result(deployed_paths: list[Path], profile: str | None, s
             # UnicodeEncodeError on a legacy Windows console codepage (cp1252) even though the
             # files were already written, so exit 1 misreports a deploy that actually succeeded.
             click.echo(f"  + {path}")
+    elif force:
+        click.echo("\nNo files were written: every target file is already identical to the bundled one.")
     else:
         click.echo("\nNo files were created (all target files already exist).")
         click.echo("Use --force to overwrite existing configuration files.")
