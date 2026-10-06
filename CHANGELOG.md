@@ -35,12 +35,19 @@ adheres to [Semantic Versioning](https://semver.org/).
   the `--env-file` when given, otherwise from the nearest `.env` up to the project root, without
   `chdir` and passing over unreadable directories; a `.env` that is not UTF-8 no longer stops
   logging. `python-dotenv` is a declared dependency.
-- **An invalid `[lib_log_rich]` value is a configuration error (exit codes changed).** A value
-  lib_log_rich refuses (a wrong type such as `rate_limit = "100:60"`, or its own range checks
-  such as `queue_maxsize = 0`) exited **22** from every command with pydantic's multi-line
-  report. Logging now starts with its defaults and the failure is recorded like a broken file:
-  `config` and `generate` exit **78** with one `Error: lib_log_rich.<key>: <reason>` line per
-  problem, never repeating the value, and `info` and `config-deploy` still run.
+- **An invalid `[lib_log_rich]` value or `LOG_*` variable is a configuration error (exit
+  codes changed).** A value lib_log_rich refuses (a wrong type such as `rate_limit = "100:60"`,
+  its own range checks such as `queue_maxsize = 0`, or an unknown level in `LOG_CONSOLE_LEVEL`,
+  set in the environment or in the `.env` logging reads) exited **22** from every command with
+  pydantic's multi-line report or a `ValueError` line. Logging now starts with its defaults and
+  the failure is recorded like a broken file: `config` and `generate` exit **78** with one
+  `Error:` line per problem, while `info`, `config-deploy` and `config-generate-examples` still
+  run with exit 0. A problem the section's type check finds reads `Error: lib_log_rich.<key>:
+  <reason>` and never repeats the value; a value only lib_log_rich refuses carries its own
+  message (`Error: lib_log_rich: Unknown log level: 'bogus'`), which may name neither the setting
+  nor where it was set. A refused `[lib_log_rich]` value leaves every valid `LOG_*` variable in
+  force for the fallback; only a refused `LOG_*` variable makes the fallback start without them
+  (they are put back afterwards).
 - **`[lib_layered_config.default_permissions]` now takes effect, and only the configuration
   files decide it.** The per-layer modes were read, but only `enabled` was ever used, so
   `--set lib_layered_config.default_permissions.user_directory='"0o750"'` still produced a `0o700`
