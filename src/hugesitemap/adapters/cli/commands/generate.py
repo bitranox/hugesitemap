@@ -28,6 +28,7 @@ from hugesitemap.domain.errors import ConfigurationError, SitemapValidationError
 from hugesitemap.domain.filters import FilterSpec
 from hugesitemap.domain.model import SitemapEntry
 
+from ..config_load import require_config
 from ..constants import CLICK_CONTEXT_SETTINGS
 from ..context import get_cli_context
 from ..exit_codes import ExitCode
@@ -125,10 +126,11 @@ def cli_generate(ctx: click.Context, site_selector: str, dry_run: bool, gzip: bo
         0
     """
     cli_ctx = get_cli_context(ctx)
+    config = require_config(ctx, cli_ctx)
     services = cli_ctx.services
     with lib_log_rich.runtime.bind(job_id="cli-generate", extra={"command": "generate"}):
         try:
-            sites = _select_sites(services.load_sites(cli_ctx.config), site_selector)
+            sites = _select_sites(services.load_sites(config), site_selector)
         except ConfigurationError as exc:
             logger.error("Configuration error: %s", exc)
             click.echo(f"\nError: {exc}", err=True)

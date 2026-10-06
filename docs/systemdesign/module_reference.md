@@ -39,7 +39,8 @@ Complete (current codebase)
   - `__init__.py` - Public facade
   - `constants.py` - Shared Click constants
   - `exit_codes.py` - POSIX exit codes (ExitCode IntEnum)
-  - `context.py` - Click context helpers (CLIContext)
+  - `context.py` - Click context helpers (CLIContext, incl. `env_file` and `config_error`)
+  - `config_load.py` - Load the configuration for the CLI; record a load failure; `require_config` refuses with 78
   - `typed_click.py` - Typed wrappers for rich_click option/version_option decorators and get_current_context
   - `root.py` - Root command group with global options
   - `main.py` - CLI entry point and execution wrapper
@@ -275,11 +276,13 @@ with a CLI-ready message.
 
 ### config/overrides.py - `--set` override parsing
 
-| Symbol                | Description                                                      |
-|-----------------------|------------------------------------------------------------------|
-| `ConfigOverride`      | Parsed override: `section`, `key_path` tuple, coerced `value`    |
-| `parse_override(raw)` | Split `SECTION.KEY[.SUBKEY...]=VALUE` into a `ConfigOverride`    |
-| `coerce_value(raw)`   | Coerce a raw string via JSON parsing, falling back to the string |
+| Symbol                          | Description                                                                         |
+|---------------------------------|-------------------------------------------------------------------------------------|
+| `ConfigOverride`                | Parsed override: `section`, `key_path` tuple, coerced `value`                       |
+| `parse_override(raw)`           | Split `SECTION.KEY[.SUBKEY...]=VALUE` into a `ConfigOverride`                       |
+| `coerce_value(raw)`             | Coerce a raw string via JSON parsing, falling back to the string                    |
+| `nest_overrides(raw)`           | Parse all `--set` values together into a nested tree; refuse conflicting keys       |
+| `apply_overrides(config, raw)`  | Deep-merge the nested `--set` tree into a `Config`                                  |
 
 ### config/permissions.py - Deploy permission defaults
 
@@ -356,6 +359,13 @@ Registered in `adapters/cli/root.py`: `info`, `generate`, `fail`, `config`,
 | `--env-file PATH`              | Explicit `.env` file path (skips upward search) |
 | `-h, --help`                   | Show help and exit                              |
 
+The root loads the configuration before any subcommand runs (`config_load.load_config`). A
+malformed or conflicting `--set` or an invalid `--profile` name is a usage error (exit 2) for
+every command, checked before loading. A file that does not load (invalid TOML, a `.env` that
+is not UTF-8, an unreadable file) is recorded, not raised: `config` and `generate` refuse with
+exit 78 and one `Error:` line naming it (`--traceback` adds the loader's traceback), while
+`info`, `config-deploy`, `config-generate-examples` and `--help` still run.
+
 ### info
 
 Print resolved package metadata.
@@ -374,7 +384,7 @@ and runs the `generate_sitemap` use case with the wired content-source and write
 | `--dry-run`                  | Walk and validate but do not write any files             |
 | `--gzip`                     | Write gzip-compressed output (overrides config when set) |
 
-**Exit codes:** 0, 1, 13 (permission denied), 22 (no/unknown site), 78 (config error)
+**Exit codes:** 0, 1, 13 (permission denied), 22 (no/unknown site), 78 (config error, incl. a configuration that did not load)
 
 ### fail
 
@@ -392,7 +402,7 @@ Display the merged configuration from all sources (defaults -> app -> host -> us
 | `--section NAME`         | Show only a specific section (e.g. `lib_log_rich`) |
 | `--profile NAME`         | Override the profile from the root command         |
 
-**Exit codes:** 0, 22 (section not found)
+**Exit codes:** 0, 2 (invalid `--profile` name), 22 (section not found), 78 (configuration did not load)
 
 ### config-deploy
 
@@ -407,7 +417,7 @@ Deploy default configuration to system or user directories.
 | `--dir-mode MODE`                  | Override directory mode (octal, e.g. `750` or `0o750`)                    |
 | `--file-mode MODE`                 | Override file mode (octal, e.g. `640` or `0o640`)                         |
 
-**Exit codes:** 0, 1, 13 (permission denied)
+**Exit codes:** 0, 1, 2 (invalid `--profile` name), 13 (permission denied)
 
 ### config-generate-examples
 
@@ -522,6 +532,10 @@ real `load_sites` so injected test configs are validated exactly as in productio
 | `strip_ansi`              | Strips ANSI escape codes from output                        |
 | `clear_config_cache`      | Clears the `get_config` LRU cache before each test          |
 | `managed_traceback_state` | Resets/restores traceback configuration                     |
+
+Two autouse fixtures apply to every test: `isolated_logging_state` shuts the lib_log_rich
+runtime down and restores the root logger afterwards, and `deterministic_cli_output` pins
+rich-click's colour and width globals so CI renders the same plain output as a terminal.
 
 ---
 

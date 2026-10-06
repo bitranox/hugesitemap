@@ -13,6 +13,22 @@ adheres to [Semantic Versioning](https://semver.org/).
   one as `<name>.bak`; a file that already holds the bundled content is left alone.
 
 ### Fixed
+- **A configuration that does not load no longer stops every command (exit codes changed).**
+  The root group loaded the configuration before any subcommand ran and let a load error
+  escape, so a malformed `config.toml`, a `.env` that is not UTF-8 or an unreadable file made
+  every command exit 1, `info` and `config-deploy` (the command that replaces the broken file)
+  included. The failure is now recorded: `config` and `generate` exit **78** with one `Error:`
+  line naming the file (`--traceback` adds the loader's traceback), while `info`,
+  `config-deploy`, `config-generate-examples` and `--help` run as usual. Any other exception
+  from the loader is a bug and propagates as one.
+- **Command-line mistakes are usage errors (exit 2) for every command, checked before
+  loading.** An invalid root `--profile` name used to exit **22**, and an invalid
+  `config-deploy --profile` name exited **1** as "Failed to deploy configuration"; both now exit
+  **2**. Conflicting `--set` values (`--set a.b=1 --set a.b.c=2`) escaped as a TypeError (exit
+  **22**), and the other order silently dropped the earlier value; both orders now exit **2**
+  naming the two keys. The same key given twice still takes the last value.
+- **`config --profile X` keeps the root's `--env-file`.** The reload used to fall back to the
+  upward `.env` search.
 - **`config-deploy --force` with nothing to write no longer tells you to use `--force`.** Under
   lib_layered_config 7 an empty result with `--force` means every target file is already
   current; the command now says so instead of repeating the hint the user just followed.
