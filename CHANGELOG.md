@@ -17,6 +17,13 @@ adheres to [Semantic Versioning](https://semver.org/).
   runtime down and restores the root logger's handlers, level and propagate flag after every test,
   and another pins rich-click's colour and width globals, so CI (GITHUB_ACTIONS set, 79-column
   Windows runners) renders the same plain output as a developer terminal.
+- **No more `SystemExit: N` on stderr.** `generate` and the config commands raised a bare
+  `SystemExit`, which `main()`'s catch-all branch printed as `SystemExit: 78` (or 1, 13, 22) after
+  the real error message, text a user reads as a crash. They now exit through click's context
+  (`ctx.exit`), and `main()` returns the exit code rich_click's `main()` hands back instead of
+  discarding it. The exit codes themselves are unchanged. `config-deploy` re-raises a deliberate
+  click `Exit` (a `RuntimeError` subclass) ahead of its catch-all, so it keeps its own code instead
+  of becoming 1. `typed_click` gains a typed `get_current_context` wrapper.
 
 ## [2.3.1] 2026-07-24 13:49:42
 

@@ -31,7 +31,7 @@ from hugesitemap.domain.model import SitemapEntry
 from ..constants import CLICK_CONTEXT_SETTINGS
 from ..context import get_cli_context
 from ..exit_codes import ExitCode
-from ..typed_click import option
+from ..typed_click import get_current_context, option
 
 if TYPE_CHECKING:
     from hugesitemap.adapters.config.site_loader import SiteConfig
@@ -132,7 +132,7 @@ def cli_generate(ctx: click.Context, site_selector: str, dry_run: bool, gzip: bo
         except ConfigurationError as exc:
             logger.error("Configuration error: %s", exc)
             click.echo(f"\nError: {exc}", err=True)
-            raise SystemExit(ExitCode.CONFIG_ERROR) from exc
+            ctx.exit(ExitCode.CONFIG_ERROR)
 
         for site in sites:
             _generate_one(services, site, gzip=gzip, dry_run=dry_run)
@@ -149,11 +149,11 @@ def _generate_one(services: AppServices, site: SiteConfig, *, gzip: bool, dry_ru
     except SitemapValidationError as exc:
         logger.error("Sitemap validation failed for %s: %s", site.name, exc)
         click.echo(f"\nError [{site.name}]: {exc}", err=True)
-        raise SystemExit(ExitCode.GENERAL_ERROR) from exc
+        get_current_context().exit(ExitCode.GENERAL_ERROR)
     except ConfigurationError as exc:
         logger.error("Configuration error for %s: %s", site.name, exc)
         click.echo(f"\nError [{site.name}]: {exc}", err=True)
-        raise SystemExit(ExitCode.CONFIG_ERROR) from exc
+        get_current_context().exit(ExitCode.CONFIG_ERROR)
     _report(site, result, dry_run=dry_run)
 
 

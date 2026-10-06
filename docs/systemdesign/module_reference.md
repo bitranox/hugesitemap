@@ -40,7 +40,7 @@ Complete (current codebase)
   - `constants.py` - Shared Click constants
   - `exit_codes.py` - POSIX exit codes (ExitCode IntEnum)
   - `context.py` - Click context helpers (CLIContext)
-  - `typed_click.py` - Typed wrappers for rich_click option/version_option decorators
+  - `typed_click.py` - Typed wrappers for rich_click option/version_option decorators and get_current_context
   - `root.py` - Root command group with global options
   - `main.py` - CLI entry point and execution wrapper
   - `commands/info.py` - info, fail commands
@@ -330,6 +330,11 @@ POSIX-conventional exit codes defined in `adapters/cli/exit_codes.py` (`ExitCode
 
 Signal codes (130, 141, 143) are informational only; `lib_cli_exit_tools` handles
 signal-to-exit-code translation.
+
+Commands exit through click's context (`ctx.exit(code)`, or `typed_click.get_current_context().exit(code)`
+in a helper with no `ctx`), never a bare `SystemExit`: under `standalone_mode=False` rich_click's
+`main()` returns that code and `adapters/cli/main.py` hands it on, while a bare `SystemExit` would
+reach the catch-all branch and print `SystemExit: N` on stderr.
 
 ---
 
