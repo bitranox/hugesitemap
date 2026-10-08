@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.4.0] 2026-10-08 10:01:26
+
 ### Changed
 - **Requires lib_layered_config 7.0.1.** An unquoted `.env` value now converts like the
   environment layer, so `..._ENABLED=false` arrives as the boolean `false` rather than the text
