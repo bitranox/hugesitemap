@@ -377,7 +377,7 @@ and runs the `generate_sitemap` use case with the wired content-source and write
 | `--dry-run`                  | Walk and validate but do not write any files             |
 | `--gzip`                     | Write gzip-compressed output (overrides config when set) |
 
-**Exit codes:** 0, 1 (a generated sitemap failed validation), 13 (permission denied writing the output), 78 (no `[[site]]` configured, an unknown `--site` name, an invalid site or `[sitemap]` section, or a configuration that did not load)
+**Exit codes:** 0, 1 (a generated sitemap failed validation), 13 (permission denied writing the output; 5 on Windows), 78 (no `[[site]]` configured, an unknown `--site` name, an invalid site or `[sitemap]` section, or a configuration that did not load)
 
 ### fail
 

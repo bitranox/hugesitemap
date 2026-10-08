@@ -10,6 +10,7 @@ with the services replaced at the composition seam.
 from __future__ import annotations
 
 import dataclasses
+import os
 from typing import TYPE_CHECKING, Any
 
 import click
@@ -81,13 +82,19 @@ def test_a_sitemap_validation_failure_exits_1_without_printing_systemexit(
 
 
 @pytest.mark.os_agnostic
-def test_a_sitemap_that_cannot_be_written_exits_13(capsys: pytest.CaptureFixture[str], tmp_path: Path) -> None:
-    """The documented 13 of ``generate``: the writer's PermissionError reaches main()'s exit-code mapping."""
+def test_a_sitemap_that_cannot_be_written_exits_with_the_platform_permission_code(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
+    """The writer's PermissionError reaches main()'s exit-code mapping, which is per platform.
+
+    lib_cli_exit_tools maps PermissionError to EACCES (13) on POSIX and to ERROR_ACCESS_DENIED (5)
+    on Windows; generate has no explicit mapping of its own, unlike config-deploy.
+    """
     services = _services(_one_site(tmp_path), write_sitemap=_raising(PermissionError("denied")))
     exit_code = main(["generate"], services_factory=services)
 
     err = capsys.readouterr().err
-    assert exit_code == 13
+    assert exit_code == (13 if os.name == "posix" else 5)
     assert "denied" in err
 
 
