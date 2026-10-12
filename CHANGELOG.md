@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- **A digit-only `.env` value no longer stops a command with `Input should be a valid string`.**
+  lib_layered_config 7.1 reads an unquoted `.env` or environment value that spells a number
+  losslessly as an int, so `SITEMAP__FILTERS__IGNORE_FILE=2026` or `LIB_LOG_RICH__SERVICE=4711`
+  reached a text setting as a number and was refused. The `[sitemap]` defaults, their filters and
+  the `[lib_log_rich]` section now turn such a number back into the text that was written;
+  numeric settings still read as numbers and invalid values are still refused.
+
 ## [2.4.0] 2026-10-08 10:01:26
 
 ### Changed

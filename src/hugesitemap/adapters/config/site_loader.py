@@ -76,7 +76,9 @@ class FilterConfig(BaseModel):
             throughout each scanned tree (for example ``.sitemapignore``).
     """
 
-    model_config = ConfigDict(extra="forbid")
+    # lib_layered_config reads an unquoted all-digit .env value (SITEMAP__FILTERS__IGNORE_FILE=2026)
+    # as an int; the conversion is lossless, so turning it back into text restores what was written.
+    model_config = ConfigDict(extra="forbid", coerce_numbers_to_str=True)
 
     keep: list[str] = Field(default_factory=list)
     ignore: list[str] = Field(default_factory=list)
@@ -156,7 +158,7 @@ class SitemapDefaults(BaseModel):
         filters: Filters prepended to / inherited by every site's own filters.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", coerce_numbers_to_str=True)
 
     gzip: bool = False
     default_priority: float = 0.5
