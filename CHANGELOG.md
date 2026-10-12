@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.4.1] 2026-10-12 19:20:20
+
 ### Fixed
 - **A digit-only `.env` value no longer stops a command with `Input should be a valid string`.**
   lib_layered_config 7.1 reads an unquoted `.env` or environment value that spells a number
