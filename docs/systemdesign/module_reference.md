@@ -431,7 +431,7 @@ Run a logging demonstration via lib_log_rich's logdemo facility.
 |----------------|---------------------------------------------|
 | `--theme NAME` | Logging theme to preview (default: classic) |
 
-**Exit codes:** 0
+**Exit codes:** 0, 2 (an unknown `--theme`), 78 (a `LOG_*` variable lib_log_rich refuses, with lib_log_rich's own line, as `config` writes it)
 
 ---
 
