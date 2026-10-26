@@ -1038,12 +1038,12 @@ requires-dist = [
     { name = "deflate", specifier = ">=0.9.0" },
     { name = "hatchling", marker = "extra == 'dev'", specifier = ">=1.32.4" },
     { name = "hypothesis", marker = "extra == 'dev'", specifier = ">=6.168.5" },
-    { name = "igittigitt", specifier = ">=2.3.0" },
+    { name = "igittigitt", specifier = ">=2.3.1" },
     { name = "import-linter", marker = "extra == 'dev'", specifier = ">=2.15" },
     { name = "jaraco-context", marker = "extra == 'dev'", specifier = ">=6.1.2" },
     { name = "lib-cli-exit-tools", specifier = ">=2.4.1" },
     { name = "lib-layered-config", specifier = ">=7.3.0" },
-    { name = "lib-log-rich", specifier = ">=6.5.7" },
+    { name = "lib-log-rich", specifier = ">=7.0.1" },
     { name = "lxml", specifier = ">=6.1.3" },
     { name = "orjson", specifier = ">=3.13.0" },
     { name = "pip-audit", marker = "extra == 'dev'", specifier = ">=2.10.1" },
@@ -1282,7 +1282,7 @@ wheels = [
 
 [[package]]
 name = "igittigitt"
-version = "2.3.0"
+version = "2.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -1296,9 +1296,9 @@ dependencies = [
     { name = "wcmatch", version = "11.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "wcmatch", version = "11.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/02/3d/ddfc3a3de4a536ded9021104f9c4782ca669975c1968a54ee1363029f3cb/igittigitt-2.3.0.tar.gz", hash = "sha256:e8d93982e440a8cf276b4abbc322656ec2bf31509c6b25308f1d55f881be3c67", size = 113647, upload-time = "2026-10-25T23:19:42.797Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c1/19/4158fd1f15991a4c692459a9fdffd3facd13234fc5dfc6bd84488999fd3d/igittigitt-2.3.1.tar.gz", hash = "sha256:9acef84205ced14241899ae2214dd7ebbb5a10baef560ae86ee80c276274f328", size = 114337, upload-time = "2026-10-26T09:45:35.131Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6d/30/9127a6430d0b1e4eef3babaf049d909e17c974cb8b6e8f62369bb08c8a07/igittigitt-2.3.0-py3-none-any.whl", hash = "sha256:53b5cdf1f0b44259994dd2e2c6893c2d59eca36fb96b78b6473f87ab191ba844", size = 82353, upload-time = "2026-10-25T23:19:40.86Z" },
+    { url = "https://files.pythonhosted.org/packages/9a/4f/47b088c6ee950fc288e70109c26668637cfc77b3ff7890204fc7683ee42e/igittigitt-2.3.1-py3-none-any.whl", hash = "sha256:f9bbab16939178b9bd4e8eb7df2f381222a57c6645ac41e31886fdc510ca291a", size = 82470, upload-time = "2026-10-26T09:45:33.679Z" },
 ]
 
 [[package]]
@@ -1451,7 +1451,7 @@ wheels = [
 
 [[package]]
 name = "lib-log-rich"
-version = "6.5.7"
+version = "7.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "lib-cli-exit-tools" },
@@ -1461,9 +1461,9 @@ dependencies = [
     { name = "rich" },
     { name = "rich-click" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4e/9d/a689aa5e239d950bd3520531124226b03fbe1ad64c2ba06cf5c35e54f05b/lib_log_rich-6.5.7.tar.gz", hash = "sha256:398a0b7add39043f025435d36eb52f7e8f679decef971c78d1e5ec7dad642b8f", size = 328531, upload-time = "2026-10-22T12:12:06.403Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6f/71/974de7e7a8fa0421971cb9a3fee8c8b1f2d5498e6a45197e5d4632b259cb/lib_log_rich-7.0.1.tar.gz", hash = "sha256:b586244418ebaa862688883a30bb5fc815d75224d6ff7d5e5080b09b135ddfe5", size = 376656, upload-time = "2026-10-26T12:38:39.514Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8e/4e/3a28d487df645a2f18b70e053fa9c991ec521da908e1ccd3a861f50de24f/lib_log_rich-6.5.7-py3-none-any.whl", hash = "sha256:aa111316d26d33c38323fa3713c187b598e788f38e0639a0a109c19e068a739e", size = 208822, upload-time = "2026-10-22T12:12:05.005Z" },
+    { url = "https://files.pythonhosted.org/packages/07/82/f4e4c15db52c90fdea86db6c1821c508e504f51533fed7f735c9f5fb5eeb/lib_log_rich-7.0.1-py3-none-any.whl", hash = "sha256:d4d60f6387d3b0aca83fc8086738af0b8014153ce26b244fdf38a76065ae838b", size = 228779, upload-time = "2026-10-26T12:38:38.277Z" },
 ]
 
 [[package]]
