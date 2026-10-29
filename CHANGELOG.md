@@ -37,7 +37,7 @@ adheres to [Semantic Versioning](https://semver.org/).
   a host substring, which also matched `xsmtp.test.com:5870`. The substring form was what CodeQL
   flagged as `py/incomplete-url-substring-sanitization`.
 
-## [2.4.3] 2026-10-15 16:36:00
+## [2.4.3] - 2026-10-15
 
 ### Fixed
 
@@ -58,7 +58,7 @@ adheres to [Semantic Versioning](https://semver.org/).
   (`pytest_runtest_setup` in `tests/conftest.py`); registered in `pyproject.toml` alone they skipped
   nothing, so a test trusting its marker ran everywhere. `tests/test_platform_markers.py` pins it.
 
-## [2.4.2] 2026-10-13 15:43:47
+## [2.4.2] - 2026-10-13
 
 ### Added
 - Python 3.15 is a supported version: declared in the classifiers, so CI and `make test-all` run it.
@@ -70,7 +70,7 @@ adheres to [Semantic Versioning](https://semver.org/).
 - The install section explains why installing with uv protects against supply-chain attacks and why
   a plain `pip install` from PyPI does not.
 
-## [2.4.1] 2026-10-12 19:20:20
+## [2.4.1] - 2026-10-12
 
 ### Fixed
 - **A digit-only `.env` value no longer stops a command with `Input should be a valid string`.**
@@ -80,7 +80,7 @@ adheres to [Semantic Versioning](https://semver.org/).
   the `[lib_log_rich]` section now turn such a number back into the text that was written;
   numeric settings still read as numbers and invalid values are still refused.
 
-## [2.4.0] 2026-10-08 10:01:26
+## [2.4.0] - 2026-10-08
 
 ### Changed
 - **Requires lib_layered_config 7.0.1.** An unquoted `.env` value now converts like the
@@ -202,7 +202,7 @@ adheres to [Semantic Versioning](https://semver.org/).
   `set_permissions: bool | None` (None, the default, follows the configured `enabled`) and
   `permission_overrides`.
 
-## [2.3.1] 2026-07-24 13:49:42
+## [2.3.1] - 2026-07-24
 
 ### Fixed
 - CI: resolve latest-ruff violations (PLR0917, PLC0415, RUF002) that turned red on the
