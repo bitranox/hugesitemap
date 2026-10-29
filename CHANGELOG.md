@@ -32,6 +32,10 @@ adheres to [Semantic Versioning](https://semver.org/).
   `tests` (which keeps the root `conftest.py` out of doctest collection), adds `tests` to `pythonpath`
   and pyright's `extraPaths`, and gives pyright an execution environment rooted at `tests/`. A test
   checks that every doctest collected from `src/` gets both redirects.
+- Three `config` display tests in `tests/test_cli_config.py` compare the shown SMTP hosts exactly
+  (the parsed JSON value, or the whole `smtp_hosts = [...]` line) instead of searching the output for
+  a host substring, which also matched `xsmtp.test.com:5870`. The substring form was what CodeQL
+  flagged as `py/incomplete-url-substring-sanitization`.
 
 ## [2.4.3] 2026-10-15 16:36:00
 
