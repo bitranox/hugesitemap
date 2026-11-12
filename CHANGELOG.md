@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.4.4] - 2026-11-12
+
 ### Fixed
 
 - A failure while shutting down logging no longer replaces the command's result: `main()` used to
