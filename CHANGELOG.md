@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.4.5] - 2026-11-18
+
 ### Changed
 
 - `lib_layered_config>=8.1.0`: `DeployAction` (and `DeployResult`) are imported from the package
