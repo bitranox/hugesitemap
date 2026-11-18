@@ -92,6 +92,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "os_name == 'nt'" },
     { name = "importlib-metadata", version = "9.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10.2'" },
+    { name = "importlib-metadata", version = "10.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_version < '0'" },
     { name = "packaging" },
     { name = "pyproject-hooks" },
     { name = "tomli", marker = "python_full_version < '3.11'" },
@@ -1195,7 +1196,7 @@ requires-dist = [
     { name = "deflate", specifier = ">=0.9.0" },
     { name = "hatchling", marker = "extra == 'dev'", specifier = ">=1.33.0" },
     { name = "hypothesis", marker = "extra == 'dev'", specifier = ">=6.168.5" },
-    { name = "igittigitt", specifier = ">=2.4.1" },
+    { name = "igittigitt", specifier = ">=2.4.2" },
     { name = "import-linter", marker = "extra == 'dev'", specifier = ">=2.15" },
     { name = "jaraco-context", marker = "extra == 'dev'", specifier = ">=6.1.2" },
     { name = "lib-cli-exit-tools", specifier = ">=2.5.0" },
@@ -1441,7 +1442,7 @@ wheels = [
 
 [[package]]
 name = "igittigitt"
-version = "2.4.1"
+version = "2.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -1455,9 +1456,9 @@ dependencies = [
     { name = "wcmatch", version = "11.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "wcmatch", version = "12.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9b/f7/8b26fea3912dab221750f6bb25bc48e2bafd9b7457ee1ff6050ba720e655/igittigitt-2.4.1.tar.gz", hash = "sha256:0b72177b7a1c0d04a3a5cfa684557d27bfdb33a7724f2a6c8e4cb407a2854a8d", size = 122972, upload-time = "2026-11-12T12:24:28.749Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4b/79/70c6d6efd1167f9fafcefdff59fbca7ce531a4b02b89993bde6bba3e9a39/igittigitt-2.4.2.tar.gz", hash = "sha256:947e58d785565a3085e783e7dd49e52f7db73d5adbbeb864d5a09b0293f463ba", size = 123049, upload-time = "2026-11-18T13:28:25.521Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a1/03/ab6b7742b522ffb99499fc232c5cbdc2f18546b88ed19fb696eecee5e649/igittigitt-2.4.1-py3-none-any.whl", hash = "sha256:d06a8c3987464f59eec90b4cb29535a65a4d07ede57be17e6ace3d63eee22113", size = 84986, upload-time = "2026-11-12T12:24:27.289Z" },
+    { url = "https://files.pythonhosted.org/packages/7a/32/f2c581697595b0101eccac207919ae5e2ef84a1213b30aee154024258bd8/igittigitt-2.4.2-py3-none-any.whl", hash = "sha256:7b408f51af6f02b1214b023e3548aca73cc205558329e6fc5c9fd30bfff666d4", size = 84976, upload-time = "2026-11-18T13:28:24.105Z" },
 ]
 
 [[package]]
